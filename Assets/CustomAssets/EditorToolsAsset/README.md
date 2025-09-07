@@ -907,6 +907,64 @@ public class DebugManager : MonoBehaviour
 - **Compilation Errors**: Ensure `ButtonEditor.cs` is in an `Editor` folder
 - **Confirmation Not Showing**: Check that the correct constructor is used for confirmation
 
+## MinMaxSlider Attribute
+
+### Features
+
+- Min–Max slider for ranges backed by Vector2 (float) and Vector2Int (int)
+- Optional numeric fields for precise input on both ends
+- Enforces limits (clamp to min/max) and ordering (max >= min)
+- Lightweight and consistent with Unity’s built-in MinMaxSlider UX
+
+### Usage
+
+- Float ranges (Vector2)
+
+```csharp
+using CustomAssets.EditorTools;
+
+public class SpawnSettings : MonoBehaviour
+{
+    // Allows picking a range between 0 and 1
+    [MinMaxSlider(0f, 1f)]
+    public Vector2 spawnTimeRange = new Vector2(0.2f, 0.8f);
+}
+```
+
+- Integer ranges (Vector2Int)
+
+```csharp
+using CustomAssets.EditorTools;
+
+public class LevelSettings : MonoBehaviour
+{
+    // Allows picking an integer range between 0 and 100
+    [MinMaxSlider(0, 100)]
+    public Vector2Int levelRange = new Vector2Int(10, 40);
+}
+```
+
+- Hide numeric fields and control decimals for floats
+
+```csharp
+using CustomAssets.EditorTools;
+
+public class MovementSettings : MonoBehaviour
+{
+    // No numeric entry fields, decimals parameter controls float precision when fields are shown
+    [MinMaxSlider(10f, 50f, showFields: false, decimals: 2)]
+    public Vector2 speedLimits = new Vector2(12f, 30f);
+}
+```
+
+### Supported types
+- Vector2 for float ranges (X = min, Y = max)
+- Vector2Int for integer ranges (X = min, Y = max)
+
+### Notes
+- Demonstrated in Assets/CustomAssets/EditorToolsAsset/Examples/MinMaxSliderExample.cs
+- Also represented in the EditorToolsExampleScene.unity under Examples/Scenes
+
 ## License
 
 This tool is part of the Custom Assets collection and follows the project's licensing terms.

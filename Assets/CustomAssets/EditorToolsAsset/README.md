@@ -28,6 +28,9 @@ A custom attribute that allows you to display and edit a float or int value as a
 ### 8. Reorderable List
 Draw arrays and List<T> fields as draggable, add/remove-enabled lists with optional element labels. Supports any Unity-serializable element type and respects nested/complex elements.
 
+### 9. ValidateInput Attribute
+Validate field values using a method on the component (or static method). The validator can return bool (valid/invalid) or a string (error message when invalid). Shows an info/warning/error box in the Inspector when invalid.
+
 ---
 
 ## ReadOnly Attribute
@@ -286,6 +289,7 @@ Assets/
 │       ├── ButtonAttribute.cs                      # Button attribute class
 │       ├── MinMaxSliderAttribute.cs                # Min–Max slider attribute class
 │       ├── ReorderableListAttribute.cs             # Reorderable list attribute class
+│       ├── ValidateInputAttribute.cs               # ValidateInput attribute class
 │       ├── Editor/
 │       │   ├── ReadOnlyPropertyDrawer.cs           # ReadOnly property drawer
 │       │   ├── ConditionalPropertyDrawer.cs        # ShowIf/HideIf property drawer
@@ -294,6 +298,7 @@ Assets/
 │       │   ├── TabGroupPropertyDrawer.cs           # TabGroup property drawer
 │       │   ├── MinMaxSliderPropertyDrawer.cs       # Min–Max slider property drawer
 │       │   ├── ReorderableListPropertyDrawer.cs    # Reorderable list property drawer
+│       │   ├── ValidateInputPropertyDrawer.cs      # ValidateInput property drawer
 │       │   └── ButtonEditor.cs                     # Button editor
 │       ├── Examples/
 │       │   ├── ReadOnlyExample.cs                  # ReadOnly usage examples
@@ -301,7 +306,8 @@ Assets/
 │       │   ├── SerializableDictionaryExample.cs    # Dictionary usage examples
 │       │   ├── TabGroupExample.cs                  # TabGroup usage examples
 │       │   ├── MinMaxSliderExample.cs              # MinMaxSlider usage examples
-│       │   └── ReorderableListExample.cs           # Reorderable list usage examples
+│       │   ├── ReorderableListExample.cs           # Reorderable list usage examples
+│       │   └── ValidateInputExample.cs             # ValidateInput usage examples
 │       └── README.md                               # This documentation
 ```
 
@@ -1055,6 +1061,36 @@ public class LootTable : MonoBehaviour
 {
     [ReorderableList("Loot Table")]
     public List<Loot> loot = new List<Loot> { new Loot { id = "gold", quantity = 10 } };
+}
+```
+
+## ValidateInput Attribute
+
+### Features
+- Per-field validation via a method on the component (or static method)
+- Validator signatures: bool Validator(T), or string Validator(T) where non-empty string = error
+- Displays Info/Warning/Error help box when invalid
+- Works with primitives, structs, lists, and object references
+
+### Usage
+
+```csharp
+using CustomAssets.EditorTools;
+
+public class PlayerSettings : MonoBehaviour
+{
+    [ValidateInput(nameof(ValidateNonNegative), "Speed must be >= 0", ValidateSeverity.Warning)]
+    public float speed = 5f;
+
+    [ValidateInput(nameof(ValidateName), "Name must not be empty")]
+    public string playerName = "Player";
+
+    private bool ValidateNonNegative(float v) => v >= 0f;
+
+    private string ValidateName(string s)
+    {
+        return string.IsNullOrWhiteSpace(s) ? "Name must not be empty" : null;
+    }
 }
 ```
 

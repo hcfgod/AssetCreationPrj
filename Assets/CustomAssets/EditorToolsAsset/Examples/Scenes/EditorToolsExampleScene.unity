@@ -1102,6 +1102,8 @@ GameObject:
   - component: {fileID: 1319207160}
   - component: {fileID: 1319207158}
   - component: {fileID: 1319207159}
+  - component: {fileID: 1319207162}
+  - component: {fileID: 1319207161}
   m_Layer: 0
   m_Name: TestGameobject
   m_TagString: Untagged
@@ -1293,6 +1295,42 @@ MonoBehaviour:
   message: Hello World!
   randomColor: {r: 1, g: 1, b: 1, a: 1}
   enableLogging: 1
+--- !u!114 &1319207161
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1319207153}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e9151ce67f8561479dcea5cb877c065, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomAssets.EditorTools.Examples.ValidateInputExample
+  speed: 5
+  displayName: Player
+  tags:
+  - a
+--- !u!114 &1319207162
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1319207153}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08507ec0dd873b2468dca237cce34a45, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomAssets.EditorTools.Examples.TitleReorderableListTest
+  unityHeaderList:
+  - Item 1
+  - Item 2
+  customTitleList:
+  - Item A
+  - Item B
+  normalField: This shows Title correctly
+  unityHeaderField: Unity header also works
 --- !u!1 &1776224341
 GameObject:
   m_ObjectHideFlags: 0

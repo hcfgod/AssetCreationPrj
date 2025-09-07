@@ -13,4 +13,3 @@ namespace CustomAssets.EditorTools.Examples
         public int affectedLayersMask;
     }
 }
-

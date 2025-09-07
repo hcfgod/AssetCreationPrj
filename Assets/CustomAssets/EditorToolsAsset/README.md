@@ -37,7 +37,7 @@ public class Example : MonoBehaviour
 ```
 
 ## Feature Summary (at a glance)
-- Layout & UX: Title, InfoBox, FoldoutGroup, TabGroup, ReorderableList
+- Layout & UX: Title, InfoBox, ProgressBar, FoldoutGroup, TabGroup, ReorderableList
 - Data & Validation: SerializableDictionary, ValidateInput (+ Min/Max/Range/Regex/NotNull/NotEmpty/NonZero), MinMaxSlider
 - Actions: Button (invoke methods safely from the Inspector)
 - Project-aware: SceneReference, TagSelector, LayerSelector, LayerMaskSelector, ShowIf/HideIf, ReadOnly
@@ -139,6 +139,16 @@ Create colored titles and headers in the Inspector with custom styling, font siz
 
 ### Min Max Slider Attribute
 A custom attribute that allows you to display and edit a float or int value as a min-max slider in the Unity Inspector. This attribute lets you define a range (minimum and maximum limits) and exposes two fields (min and max) as a draggable slider, making it easy to select value ranges for things like spawn areas, stat ranges, or configurable thresholds. The MinMaxSlider attribute supports both float and int types, and provides a clear, user-friendly interface for range selection directly in the Inspector.
+
+### ProgressBar Attribute
+Displays a non-editable progress bar for int and float fields. Configure the min/max range, color, height, and whether to show the percentage value inside the bar. Useful for visualizing health, charge, loading, or any normalized metric.
+
+Examples
+
+```csharp
+[ProgressBar(0, 100, label: "Health", hexColor: "#FF6B6B")] public int health;
+[ProgressBar(0f, 1f, label: "Charge", hexColor: "#4ECDC4")] public float charge;
+```
 
 ### Reorderable List
 Draw arrays and List<T> fields as draggable, add/remove-enabled lists with optional element labels. Supports any Unity-serializable element type and respects nested/complex elements.
@@ -421,6 +431,7 @@ Assets/
 │       ├── LayerMaskSelectorAttribute.cs           # LayerMask selector attribute class
 │       ├── InfoBoxAttribute.cs                     # Info box attribute
 │       ├── MinMaxSliderAttribute.cs                # Min–Max slider attribute class
+│       ├── ProgressBarAttribute.cs                 # Progress bar attribute class
 │       ├── ReorderableListAttribute.cs             # Reorderable list attribute class
 │       ├── ValidateInputAttribute.cs               # ValidateInput attribute class
 │       ├── MinValueAttribute.cs                    # Convenience validators (numeric)
@@ -444,6 +455,7 @@ Assets/
 │       │   ├── InfoBoxPropertyDrawer.cs            # Info box property drawer
 │       │   ├── FoldoutGroupPropertyDrawer.cs       # Foldout group property drawer
 │       │   ├── MinMaxSliderPropertyDrawer.cs       # Min–Max slider property drawer
+│       │   ├── ProgressBarPropertyDrawer.cs        # Progress bar property drawer
 │       │   ├── ReorderableListPropertyDrawer.cs    # Reorderable list property drawer
 │       │   ├── ValidateInputPropertyDrawer.cs      # ValidateInput property drawer
 │       │   └── ButtonEditor.cs                     # Button editor
@@ -460,6 +472,7 @@ Assets/
 │       │   └── InfoBoxExample.cs                   # Info box usage examples
 │       │   ├── MinMaxSliderExample.cs              # MinMaxSlider usage examples
 │       │   ├── ReorderableListExample.cs           # Reorderable list usage examples
+│       │   ├── ProgressBarExample.cs               # ProgressBar usage examples
 │       │   ├── ValidateInputExample.cs             # ValidateInput usage examples
 │       │   └── ValidateConvenienceExample.cs       # Convenience validators usage examples
 │       └── README.md                               # This documentation

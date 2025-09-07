@@ -1108,6 +1108,10 @@ GameObject:
   - component: {fileID: 1319207164}
   - component: {fileID: 1319207165}
   - component: {fileID: 1319207166}
+  - component: {fileID: 1319207169}
+  - component: {fileID: 1319207168}
+  - component: {fileID: 1319207167}
+  - component: {fileID: 1319207170}
   m_Layer: 0
   m_Name: TestGameobject
   m_TagString: Untagged
@@ -1409,10 +1413,71 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CustomAssets.EditorTools.Examples.InfoBoxExample
   someValue: 0
+  longDescription: This is a long message that may span multiple lines when shown
+    in an info box.
+  fixedHeightExample: 7
   experimentalValue: 0.81
   showError: 0
   guardedField: 
   advancedSetting: 5
+--- !u!114 &1319207167
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1319207153}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99784e1b83cd9674b8742971920c6147, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomAssets.EditorTools.Examples.LayerMaskSelectorExample
+  affectedLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  affectedLayersMask: 0
+--- !u!114 &1319207168
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1319207153}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fa8d1461ce1c804f96101a707694401, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomAssets.EditorTools.Examples.LayerSelectorExample
+  enemyLayerIndex: 0
+  effectsLayerName: Default
+--- !u!114 &1319207169
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1319207153}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8dc00039590bd564180fb58de05fc7bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomAssets.EditorTools.Examples.TagSelectorExample
+  targetTag: Untagged
+--- !u!114 &1319207170
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1319207153}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: baa31bb1dde8d7d4697ce50ad463abcb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomAssets.EditorTools.Examples.ProgressBarExample
+  health: 75
+  charge: 0.64
+  loading: 0.3
 --- !u!1 &1776224341
 GameObject:
   m_ObjectHideFlags: 0

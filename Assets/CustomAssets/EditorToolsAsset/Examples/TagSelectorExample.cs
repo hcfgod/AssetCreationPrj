@@ -9,4 +9,3 @@ namespace CustomAssets.EditorTools.Examples
         public string targetTag = "Untagged";
     }
 }
-

@@ -64,19 +64,37 @@ namespace CustomAssets.EditorTools.Editor
             {
                 EditorGUIUtility.AddCursorRect(barRect, MouseCursor.SlideArrow);
                 Event e = Event.current;
-                if ((e.type == EventType.MouseDown || e.type == EventType.MouseDrag) && barRect.Contains(e.mousePosition))
+                if (e != null && (e.type == EventType.MouseDown || e.type == EventType.MouseDrag || e.type == EventType.MouseUp))
                 {
-                    float nt = Mathf.InverseLerp(barRect.x, barRect.xMax, e.mousePosition.x);
-                    nt = Mathf.Clamp01(nt);
-                    float newVal = Mathf.Lerp(attr.Min, attr.Max, nt);
-                    if (isInt)
-                        property.intValue = Mathf.RoundToInt(newVal);
-                    else
-                        property.floatValue = newVal;
-                    GUI.changed = true;
-                    e.Use();
-                    // Update t used for label redraw
-                    t = nt;
+                    // Inclusive hit-test with slight tolerance on the right edge
+                    bool within = e.mousePosition.y >= barRect.y && e.mousePosition.y <= barRect.yMax &&
+                                  e.mousePosition.x >= barRect.x - 1f && e.mousePosition.x <= barRect.xMax + 1f;
+                    if (within)
+                    {
+                        float mx = Mathf.Clamp(e.mousePosition.x, barRect.x, barRect.xMax);
+                        float nt = (mx - barRect.x) / Mathf.Max(1e-6f, (barRect.xMax - barRect.x));
+                        nt = Mathf.Clamp01(nt);
+                        float newVal = Mathf.Lerp(attr.Min, attr.Max, nt);
+                        bool changed = false;
+                        if (isInt)
+                        {
+                            int iv = Mathf.RoundToInt(newVal);
+                            if (iv != property.intValue) { property.intValue = iv; changed = true; }
+                        }
+                        else
+                        {
+                            if (!Mathf.Approximately(newVal, property.floatValue)) { property.floatValue = newVal; changed = true; }
+                        }
+                        if (changed)
+                        {
+                            GUI.changed = true;
+                            // Ensure the underlying serialized value gets committed
+                            property.serializedObject.ApplyModifiedProperties();
+                        }
+                        // Update t used for bar/label redraw
+                        t = nt;
+                        e.Use();
+                    }
                 }
             }
 

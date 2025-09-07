@@ -13,6 +13,9 @@ A comprehensive serializable dictionary system with Inspector integration for ed
 ### 3. TabGroup Attribute
 Group fields into toolbar-style tabs similar to Odin Inspector's TabGroup, with clean buttons (no foldout arrows).
 
+### 4. Button Attribute
+Create custom buttons in the Inspector that execute methods directly, with extensive customization options.
+
 ---
 
 ## ReadOnly Attribute
@@ -245,16 +248,213 @@ Both tools work with all Unity serializable types:
 3. **Validate Data**: Check for required keys before accessing values
 4. **Use Constants for Keys**: Define key constants to avoid typos
 
+---
+
+## Button Attribute
+
+### Features
+
+- **Method Execution**: Execute any public method with no parameters directly from the Inspector
+- **Customizable Appearance**: Set button text, size, colors, and order
+- **Mode Restrictions**: Enable buttons only in play mode or edit mode
+- **Confirmation Dialogs**: Add confirmation prompts for dangerous actions
+- **Multiple Constructors**: Various constructor overloads for different configurations
+- **Error Handling**: Graceful error handling with detailed logging
+- **Undo Support**: Automatic undo recording for method execution
+
+### Usage
+
+#### Basic Usage
+
+```csharp
+using CustomAssets.EditorTools;
+
+public class GameManager : MonoBehaviour
+{
+    [Button]
+    public void StartGame()
+    {
+        Debug.Log("Game started!");
+    }
+    
+    [Button("Reset Level")]
+    public void ResetLevel()
+    {
+        Debug.Log("Level reset!");
+    }
+}
+```
+
+#### Advanced Configuration
+
+```csharp
+public class AdvancedExample : MonoBehaviour
+{
+    [Button("Custom Button", 30f, 150f, 5)]
+    public void CustomButton()
+    {
+        Debug.Log("Custom button clicked!");
+    }
+    
+    [Button("Play Mode Only", true)]
+    public void PlayModeOnlyMethod()
+    {
+        Debug.Log("This only works in play mode!");
+    }
+    
+    [Button("Edit Mode Only", false, true)]
+    public void EditModeOnlyMethod()
+    {
+        Debug.Log("This only works in edit mode!");
+    }
+    
+    [Button("Colored Button", "#FFFF00", "#FF0000")]
+    public void ColoredButton()
+    {
+        Debug.Log("Colored button clicked!");
+    }
+    
+    [Button("Dangerous Action", true, "Are you sure?")]
+    public void DangerousAction()
+    {
+        Debug.Log("Dangerous action executed!");
+    }
+}
+```
+
+#### Constructor Parameters
+
+```csharp
+[Button("Button Text", 25f, 0f, 5)]
+public void CustomButton() { }
+
+[Button("Play Mode Button", true)]
+public void PlayModeButton() { }
+
+[Button("Edit Mode Button", false, true)]
+public void EditModeButton() { }
+
+[Button("Confirmation Button", true, "Are you sure?")]
+public void ConfirmationButton() { }
+
+[Button("Colored Button", "#FFFF00", "#FF0000")]
+public void ColoredButton() { }
+```
+
+### Constructor Parameters
+
+| Constructor | Parameters | Description |
+|-------------|------------|-------------|
+| `Button()` | None | Default button with method name |
+| `Button(string)` | `buttonText` | Button with custom text |
+| `Button(string, float)` | `buttonText`, `buttonHeight` | Button with custom text and height |
+| `Button(string, float, float)` | `buttonText`, `buttonHeight`, `buttonWidth` | Button with custom text, height, and width |
+| `Button(string, float, float, int)` | `buttonText`, `buttonHeight`, `buttonWidth`, `order` | Button with custom text, height, width, and order |
+| `Button(string, bool)` | `buttonText`, `playModeOnly` | Button that only works in play mode |
+| `Button(string, bool, bool)` | `buttonText`, `playModeOnly`, `editModeOnly` | Button with mode restrictions |
+| `Button(string, bool, string)` | `buttonText`, `showConfirmation`, `confirmationMessage` | Button with confirmation dialog |
+| `Button(string, string, string)` | `buttonText`, `textColorHex`, `backgroundColorHex` | Button with custom colors (hex strings) |
+
+### Requirements
+
+- **Method Signature**: Methods must be `public` and have no parameters
+- **Return Type**: Methods must return `void`
+- **Target Types**: Works with `MonoBehaviour` and `ScriptableObject` classes
+- **Editor Folder**: Button editor scripts must be in an `Editor` folder
+
+### Examples
+
+#### Game Management
+
+```csharp
+public class GameController : MonoBehaviour
+{
+    [Button("Start Game")]
+    public void StartGame()
+    {
+        Time.timeScale = 1f;
+        Debug.Log("Game started!");
+    }
+    
+    [Button("Pause Game")]
+    public void PauseGame()
+    {
+        Time.timeScale = 0f;
+        Debug.Log("Game paused!");
+    }
+    
+    [Button("Reset Game").SetConfirmation()]
+    public void ResetGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+}
+```
+
+#### Component Management
+
+```csharp
+public class ComponentManager : MonoBehaviour
+{
+    [Button("Add Rigidbody")]
+    public void AddRigidbody()
+    {
+        if (GetComponent<Rigidbody>() == null)
+        {
+            gameObject.AddComponent<Rigidbody>();
+        }
+    }
+    
+    [Button("Remove Rigidbody")]
+    public void RemoveRigidbody()
+    {
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            DestroyImmediate(rb);
+        }
+    }
+}
+```
+
+#### Debugging Tools
+
+```csharp
+public class DebugTools : MonoBehaviour
+{
+    [Button("Log Transform Info")]
+    public void LogTransformInfo()
+    {
+        Debug.Log($"Position: {transform.position}");
+        Debug.Log($"Rotation: {transform.rotation}");
+        Debug.Log($"Scale: {transform.localScale}");
+    }
+    
+    [Button("Randomize Position")]
+    public void RandomizePosition()
+    {
+        transform.position = new Vector3(
+            Random.Range(-10f, 10f),
+            Random.Range(-10f, 10f),
+            Random.Range(-10f, 10f)
+        );
+    }
+}
+```
+
+---
+
 ## Troubleshooting
 
 ### ReadOnly Attribute Issues
 - **Field Still Editable**: Ensure the `ReadOnlyPropertyDrawer.cs` is in an `Editor` folder
 - **Compilation Errors**: Make sure you're using the correct namespace: `CustomAssets.EditorTools`
 
-### Serializable Dictionary Issues
-- **Dictionary Not Showing in Inspector**: Ensure the dictionary field is public and namespace is imported
-- **Duplicate Key Warnings**: Check for duplicate keys in the Inspector
-- **Serialization Errors**: Ensure all key and value types are serializable
+### Button Attribute Issues
+- **Button Not Appearing**: Ensure the method is `public` and has no parameters
+- **Method Not Executing**: Check that the method returns `void` and has no parameters
+- **Compilation Errors**: Ensure `ButtonEditor.cs` is in an `Editor` folder
+- **Confirmation Not Showing**: Check that the correct constructor is used for confirmation
 
 ## License
 

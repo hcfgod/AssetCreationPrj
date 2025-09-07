@@ -40,7 +40,7 @@ public class Example : MonoBehaviour
 - Layout & UX: Title, InfoBox, FoldoutGroup, TabGroup, ReorderableList
 - Data & Validation: SerializableDictionary, ValidateInput (+ Min/Max/Range/Regex/NotNull/NotEmpty/NonZero), MinMaxSlider
 - Actions: Button (invoke methods safely from the Inspector)
-- Project-aware: SceneReference (string or SceneAsset), ShowIf/HideIf, ReadOnly
+- Project-aware: SceneReference, TagSelector, LayerSelector, ShowIf/HideIf, ReadOnly
 
 ## Examples
 See `Assets/CustomAssets/EditorToolsAsset/Examples/` for concise patterns you can copy into production.
@@ -86,6 +86,31 @@ public string anySceneName;
 #if UNITY_EDITOR
 public UnityEditor.SceneAsset mainMenuSceneAsset;
 #endif
+```
+
+### TagSelector Attribute
+Show a Unity Tag dropdown for string fields. Stores the selected tag name.
+
+Examples
+
+```csharp
+[TagSelector]
+public string targetTag = "Untagged";
+```
+
+### LayerSelector Attribute
+Show a Unity Layer dropdown. Supports both integer fields (layer index) and string fields (layer name).
+
+Examples
+
+```csharp
+// Store layer index
+[LayerSelector]
+public int enemyLayerIndex = 0;
+
+// Store layer name
+[LayerSelector]
+public string effectsLayerName = "Default";
 ```
 
 ### Button Attribute
@@ -376,6 +401,8 @@ Assets/
 │       ├── ButtonAttribute.cs                      # Button attribute class
 │       ├── FoldoutGroupAttribute.cs                # Foldout group attribute class
 │       ├── SceneReferenceAttribute.cs              # Scene reference attribute class
+│       ├── TagSelectorAttribute.cs                 # Tag selector attribute class
+│       ├── LayerSelectorAttribute.cs               # Layer selector attribute class
 │       ├── InfoBoxAttribute.cs                     # Info box attribute
 │       ├── MinMaxSliderAttribute.cs                # Min–Max slider attribute class
 │       ├── ReorderableListAttribute.cs             # Reorderable list attribute class
@@ -395,6 +422,8 @@ Assets/
 │       │   ├── TabGroupPropertyDrawer.cs           # TabGroup property drawer
 │       │   ├── FoldoutGroupPropertyDrawer.cs       # Foldout group property drawer
 │       │   ├── SceneReferencePropertyDrawer.cs     # Scene reference property drawer
+│       │   ├── TagSelectorPropertyDrawer.cs         # Tag selector property drawer
+│       │   ├── LayerSelectorPropertyDrawer.cs       # Layer selector property drawer
 │       │   ├── InfoBoxPropertyDrawer.cs            # Info box property drawer
 │       │   ├── FoldoutGroupPropertyDrawer.cs       # Foldout group property drawer
 │       │   ├── MinMaxSliderPropertyDrawer.cs       # Min–Max slider property drawer
@@ -408,6 +437,8 @@ Assets/
 │       │   ├── TabGroupExample.cs                  # TabGroup usage examples
 │       │   ├── FoldoutGroupExample.cs              # Foldout group usage examples
 │       │   ├── SceneReferenceExample.cs            # Scene reference usage examples
+│       │   ├── TagSelectorExample.cs               # Tag selector usage examples
+│       │   ├── LayerSelectorExample.cs             # Layer selector usage examples
 │       │   └── InfoBoxExample.cs                   # Info box usage examples
 │       │   ├── MinMaxSliderExample.cs              # MinMaxSlider usage examples
 │       │   ├── ReorderableListExample.cs           # Reorderable list usage examples

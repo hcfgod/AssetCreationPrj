@@ -17,7 +17,31 @@ Group fields into toolbar-style tabs similar to Odin Inspector's TabGroup, with 
 Group multiple fields under a single foldout header, similar to Odin Inspector's FoldoutGroup. Fields that share the same group name share one foldout state per-object instance. You can control default expansion and which field draws the header via an optional order.
 
 ### 5. SceneReference Attribute
-Show a scene dropdown instead of a string field. You can choose to save as scene name (default) or path, and restrict to Build Settings scenes or list all project scenes.
+Show a scene dropdown instead of a string or SceneAsset field. Options let you save string fields as scene name (default) or path, and restrict to Build Settings scenes or list all project scenes.
+
+- Supports: string, SceneAsset
+- Options (string only): saveAsPath, onlyBuildScenes
+
+Examples
+
+```csharp
+// String — by name from Build Settings
+[SceneReference]
+public string mainMenuScene;
+
+// String — by path from Build Settings
+[SceneReference(saveAsPath: true)]
+public string gameplayScenePath;
+
+// String — any project scene by name
+[SceneReference(saveAsPath: false, onlyBuildScenes: false)]
+public string anySceneName;
+
+// SceneAsset reference (Editor-only)
+#if UNITY_EDITOR
+public UnityEditor.SceneAsset mainMenuSceneAsset;
+#endif
+```
 
 ### 4. Button Attribute
 Create custom buttons in the Inspector that execute methods directly, with extensive customization options.

@@ -12,5 +12,10 @@ namespace CustomAssets.EditorTools.Examples
 
         [Header("By Name (All Project Scenes)")]
         [SceneReference(saveAsPath: false, onlyBuildScenes: false)] public string anySceneName;
+
+        [Header("SceneAsset (Object Reference)")]
+        #if UNITY_EDITOR
+        public UnityEditor.SceneAsset mainMenuSceneAsset;
+        #endif
     }
 }

@@ -1,0 +1,170 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
+# Warp Rules: Professional AAA Unity Game Development
+
+This document codifies standards, conventions, and workflows for a professional-grade AAA Unity project. It’s written to guide both humans and AI agents working in this repository so outcomes are consistent, performant, and scalable.
+
+Rule precedence
+- Subdirectory rules override root rules: if a folder contains its own warp.md, it takes precedence for files in that folder.
+- Project rules override personal preferences when they conflict.
+- If a rule is ambiguous, prefer the safest option (e.g., read-only, deterministic, reviewed) and ask for clarification.
+
+Quick-start checklist (do this first for any new clone)
+1) Use the pinned Unity LTS version from ProjectSettings/ProjectVersion.txt. Do not upgrade mid-milestone without approval.
+2) In Editor Settings: Force Text serialization; Visible Meta Files; Asset Pipeline v2.
+3) Enable Smart Merge (UnityYAMLMerge) for Git. Lock scenes/prefabs/materials when editing.
+4) Install Git LFS and pull LFS objects. Ensure .gitattributes enforces LFS for large binaries.
+5) Configure cache server (remote preferred) for faster imports; verify identical platform import settings.
+6) Verify Packages/manifest.json and packages-lock.json are committed and reproducible.
+7) Build automation: validate -batchmode CI build works end-to-end.
+8) Rider/VS configured with repository .editorconfig and analyzers. Treat warnings as errors in CI.
+
+Unity versioning & project configuration
+- Target Unity LTS only; pin the exact version. Consolidate upgrades into scheduled tech passes.
+- ProjectSettings
+  - Editor: Force Text; Visible Meta; Asset Pipeline v2; Enter Play Mode Options allowed only with explicit approval.
+  - Player: Linear color space; GPU instancing on; SRGB on; IL2CPP for release on platforms that support it.
+  - Quality: Define platform-specific tiers; prefer HDRP for PC/Console; URP for Switch/Mobile.
+  - Scripting: .NET Standard 2.1+/latest; enable incremental GC; disable script debugging in release.
+- Disable auto-refresh during massive imports; re-enable before commit.
+
+Source control
+- System: Git with LFS (Perforce acceptable if explicitly chosen for a subproject). Always commit meta files.
+- LFS: Required for binary assets (textures, audio, video, large meshes, animation clips). Keep source (e.g., PSD) in LFS.
+- Smart Merge (UnityYAMLMerge): Required for Scenes/Prefabs. Configure git attributes to route merges accordingly.
+- Branching: Trunk-based with short-lived topic branches; release branches for stabilization; hotfix branches for live issues.
+- Reviews: 2 approvals required for core systems; 1 for content-only changes. CI must be green before merge.
+- Commit hygiene: Small, atomic commits with meaningful messages; include scene/prefab lock notes; avoid mixing content and code in the same commit when possible.
+- Do not commit: Library/, Temp/, Logs/, obj/, Build/, UserSettings/, DerivedDataCache/.
+
+Project structure
+Assets/
+  Art/Characters, Art/Environments, Art/Props, Art/VFX
+  Audio/Music, Audio/SFX, Audio/VO
+  Materials/
+  Textures/
+  Shaders/HDRP or Shaders/URP
+  Prefabs/
+  Scenes/Boot, Scenes/Menu, Scenes/Worlds
+  Scripts/Runtime, Scripts/Editor, Scripts/Tests, Scripts/ThirdParty
+  Addressables/
+  Animations/
+  UI/
+  StreamingAssets/
+  Plugins/ (managed), NativePlugins/ (unmanaged)
+  Settings/
+  Tools/
+  Packages/ (embedded custom packages as needed)
+
+Naming conventions (folders and assets)
+- Scripts: PascalCase, one type per file. Editor scripts end with Editor.
+- Scenes: SCN_{Category}_{Name} (e.g., SCN_Boot_Main, SCN_Worlds_NYC).
+- Prefabs: P_{Feature}_{Name} (e.g., P_Character_Player, P_Prop_Door).
+- Materials: M_{Surface}_{Detail} (e.g., M_Metal_Brushed, M_Wood_Oak).
+- Shaders: S_{Pipeline}_{Group}_{Name} (e.g., S_HDRP_Characters_Skin, S_URP_VFX_Distortion).
+- Textures: T_{Asset}_{Map} with fixed map codes: BC (basecolor), N (normal), M (metallic), R (roughness), AO, E (emissive), H (height). Example: T_Crate_BC, T_Crate_N.
+- Animations: A_{Rig}_{Action} (e.g., A_Player_Run).
+- ScriptableObjects: {Name}Settings, {Name}Config, or {Name}Database; file equals class name.
+
+Assemblies (asmdef) & packages
+- Create asmdef per feature or layer: Company.Core, Company.Gameplay, Company.UI, Company.Editor, Company.Tests.
+- Separate Runtime, Editor, and Tests assemblies. Editor assemblies must reference UnityEditor and be Editor-only.
+- Keep a DAG: lower-level utilities must not depend on gameplay layers.
+- Enable “Define Constraints” and “Platforms” to reduce compilation time and enforce boundaries.
+- Prefer Unity packages for reusable code; embed for local modification; publish to a registry when stable.
+
+Coding standards (C#)
+- Follow .editorconfig in repo; Rider/VS configured to respect it. Use nullable reference types where feasible.
+- Use Roslyn/StyleCop/Unity analyzers. No new warnings; warnings as errors in CI for Runtime code.
+- Avoid allocations in hot paths (Update, FixedUpdate, rendering callbacks). No LINQ/foreach in tight loops.
+- Use object pooling for transient objects. Avoid Instantiate/Destroy in gameplay loops.
+- Avoid FindObjectOfType/FindWithTag at runtime; cache references via injection or serialized fields.
+- Events: Use C# events or a channel/observer pattern (ScriptableObject event channels) to decouple systems.
+- Logging: Wrap Debug.* with compile-time defines. No Debug.Log in release; use a centralized logger.
+- Time and units: SI units, meters, seconds, kg. No hard-coded magic numbers; use constants and ScriptableObjects.
+
+Gameplay architecture
+- Prefer composition over inheritance. Keep MonoBehaviours slim; move logic to plain C# services.
+- Data: Use ScriptableObjects for configuration, state-less data and event channels; keep save-game data separate.
+- Performance-critical systems: consider Jobs/Burst/ECS only where justified; otherwise stick to GameObjects.
+- Determinism: isolate non-deterministic APIs; for multiplayer, adopt authoritative model and rollback where needed.
+
+Performance & memory budgets
+- Establish per-platform budgets (CPU, GPU, memory, draw calls, triangles, texture size). Track in a shared doc.
+- Use Profiler, Profile Analyzer, and RenderDoc (or PIX/NSight) for regular captures and regression tracking.
+- Rendering: Use GPU instancing; set up SRP Batcher; proper shader variants stripping; LODGroups; occlusion culling.
+- Memory: Disable Read/Write on meshes unless required; compress textures per platform; unload Addressables not in use.
+- Physics: Layer-based queries; fixed timestep consistency; avoid per-frame allocations in callbacks.
+
+Art & asset pipeline
+- Scale and orientation: 1 unit = 1 meter; Y-up; forward is +Z. Pivots placed for intended manipulation.
+- Mesh import: Generate lightmap UVs as needed; correct normals/tangents; Read/Write disabled by default; optimize mesh.
+- Texture import: sRGB for base color; normal map flagged; use platform overrides (ASTC/BCn/ETC2) with max sizes set.
+- Animation: Use root motion when appropriate; compression set to Optimal; retarget through Humanoid where applicable.
+- LODs: Provide LOD0..N with sane screen-relative transition values; verify materials across LODs.
+- VFX: Use VFX Graph for complex effects; limit overdraw; test in target performance scenes.
+
+Lighting & rendering pipeline
+- Choose a single SRP per product: HDRP (PC/Console) or URP (Mobile/Switch). Do not mix in the same product.
+- Linear color space; Physical Light Units; Project-wide exposure metering policy.
+- Baked vs dynamic lighting strategy documented; use light probes and reflection probes consistently.
+- Shader variant management: strip unused variants; keep keyword counts minimal; profile build time.
+
+Scenes, prefabs, and Addressables
+- Scene organization: Boot scene loads additive layers (Environment, Gameplay, UI). Keep a small base scene.
+- Prefabs: Use nested prefabs; avoid editing prefabs in scene unless necessary; maintain clean overrides.
+- Addressables: All streaming/runtime-loaded content must be Addressables; use labels for content packs; version groups.
+- Resources/: Prohibited except for tiny bootstrap items with explicit approval.
+
+Input, save, and localization
+- Input: Use the Input System package. No direct Input.* in gameplay; centralize bindings and rebind flow.
+- Save/Load: Use a versioned format; separate user settings from save state; handle corruption and migration.
+- Localization: Use Unity Localization package. No hard-coded strings in UI; all user-facing text in string tables.
+
+Builds & CI/CD
+- CI builds: Use unity -batchmode -nographics; build scripts in a Build/Build.cs (or package) entry point.
+- Output structure: Builds/{Platform}/{SemVer}/{DateTime}/; embed build metadata (branch, commit) into About screen.
+- Code signing: Required for platform stores; keys are injected via secure environment variables in CI.
+- Testing gates: EditMode/PlayMode tests must pass. Optional: performance regression gate with thresholds.
+- Cache server enabled in CI; reuse Library cache between identical Unity versions when safe.
+
+Testing & QA
+- Unit tests for core logic (no engine dependency) in Tests assemblies. PlayMode tests for integration.
+- Performance tests using Unity Performance Testing package; track trends in CI artifacts.
+- Golden-scene validation: Load critical scenes in CI to validate lighting/Addressables/variants.
+- Automated content validation: asset naming, import settings, missing references checks in CI.
+
+Third-party packages & licensing
+- All external dependencies require license review and a package manifest entry. No ad-hoc drop-ins under Assets/.
+- Wrap third-party APIs; do not leak vendor types through public boundaries.
+- Keep vendor updates isolated and documented (CHANGELOG with version and diffs).
+
+Security & secrets
+- No secrets committed to the repo. CI pulls secrets from environment variables or a secret store.
+- Never print secrets in logs. Use redaction and secure channels for distribution.
+
+Native plugins (C/C++) and Windows builds — Premake policy
+- For native plugins and tooling on Windows, generate Visual Studio projects using Premake 5.
+- Provide a bootstrap script at Scripts/SetupPremake.ps1 (and .sh for cross-platform) that downloads premake and generates solution files.
+- Store premake5.lua alongside plugin source under NativePlugins/{PluginName}/. Output to NativePlugins/bin/{cfg}/{arch}.
+- Do not commit generated solutions or build outputs; commit the premake script and configuration.
+
+Documentation & decision records
+- Maintain a high-level Architecture.md and per-feature READMEs in the feature folder root.
+- Use lightweight Architecture Decision Records (ADRs) for significant choices (rendering pipeline, netcode, save format).
+- Keep CHANGELOG.md at project root with human-readable highlights per version.
+
+Definition of Done (feature-level)
+- Meets performance budgets in target scenes.
+- No GC allocs in hot paths; no critical warnings; tests passing; CI build green.
+- Scene/prefab overrides applied or reverted; Addressables profiles updated; localization entries added.
+- Documentation and changelog updated; code reviewed and approved.
+
+When in doubt
+- Prefer clarity over cleverness; prefer data-driven over hard-coded logic; measure before optimizing.
+- Raise a short RFC for cross-team-impacting changes before implementation.
+

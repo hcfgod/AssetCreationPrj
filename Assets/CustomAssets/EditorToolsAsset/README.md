@@ -25,6 +25,9 @@ Create colored titles and headers in the Inspector with custom styling, font siz
 ### 7. Min Max Slider Attribute
 A custom attribute that allows you to display and edit a float or int value as a min-max slider in the Unity Inspector. This attribute lets you define a range (minimum and maximum limits) and exposes two fields (min and max) as a draggable slider, making it easy to select value ranges for things like spawn areas, stat ranges, or configurable thresholds. The MinMaxSlider attribute supports both float and int types, and provides a clear, user-friendly interface for range selection directly in the Inspector.
 
+### 8. Reorderable List
+Draw arrays and List<T> fields as draggable, add/remove-enabled lists with optional element labels. Supports any Unity-serializable element type and respects nested/complex elements.
+
 ---
 
 ## ReadOnly Attribute
@@ -278,22 +281,27 @@ Assets/
 │       ├── ConditionalAttribute.cs                 # Base class for conditional attributes
 │       ├── TitleAttribute.cs                       # Title attribute class
 │       ├── SerializableDictionary.cs               # Base dictionary class
-│       ├── CommonDictionaryTypes.cs                 # Pre-defined dictionary types
+│       ├── CommonDictionaryTypes.cs                # Pre-defined dictionary types
 │       ├── TabGroupAttribute.cs                    # TabGroup attribute class
 │       ├── ButtonAttribute.cs                      # Button attribute class
+│       ├── MinMaxSliderAttribute.cs                # Min–Max slider attribute class
+│       ├── ReorderableListAttribute.cs             # Reorderable list attribute class
 │       ├── Editor/
 │       │   ├── ReadOnlyPropertyDrawer.cs           # ReadOnly property drawer
 │       │   ├── ConditionalPropertyDrawer.cs        # ShowIf/HideIf property drawer
 │       │   ├── TitlePropertyDrawer.cs              # Title property drawer
 │       │   ├── SerializableDictionaryPropertyDrawer.cs # Dictionary property drawer
 │       │   ├── TabGroupPropertyDrawer.cs           # TabGroup property drawer
+│       │   ├── MinMaxSliderPropertyDrawer.cs       # Min–Max slider property drawer
+│       │   ├── ReorderableListPropertyDrawer.cs    # Reorderable list property drawer
 │       │   └── ButtonEditor.cs                     # Button editor
 │       ├── Examples/
-│       │   ├── ReadOnlyExample.cs                   # ReadOnly usage examples
+│       │   ├── ReadOnlyExample.cs                  # ReadOnly usage examples
 │       │   ├── ConditionalExample.cs               # ShowIf/HideIf usage examples
-│       │   ├── SerializableDictionaryExample.cs   # Dictionary usage examples
+│       │   ├── SerializableDictionaryExample.cs    # Dictionary usage examples
 │       │   ├── TabGroupExample.cs                  # TabGroup usage examples
-│       │   └── ButtonExample.cs                   # Button usage examples
+│       │   ├── MinMaxSliderExample.cs              # MinMaxSlider usage examples
+│       │   └── ReorderableListExample.cs           # Reorderable list usage examples
 │       └── README.md                               # This documentation
 ```
 
@@ -996,6 +1004,59 @@ public class MovementSettings : MonoBehaviour
 ### Notes
 - Demonstrated in Assets/CustomAssets/EditorToolsAsset/Examples/MinMaxSliderExample.cs
 - Also represented in the EditorToolsExampleScene.unity under Examples/Scenes
+
+## ReorderableList Attribute
+
+### Features
+
+- Drag-and-drop reordering for arrays and List<T>
+- Add/Remove element controls
+- Supports complex/nested element types with variable heights
+- Optional element index labels and custom header text
+
+### Usage
+
+- Array of ints
+
+```csharp
+using CustomAssets.EditorTools;
+
+public class Levels : MonoBehaviour
+{
+    [ReorderableList]
+    public int[] levels = new[] { 1, 2, 3 };
+}
+```
+
+- List of strings with header
+
+```csharp
+using CustomAssets.EditorTools;
+using System.Collections.Generic;
+
+public class Inventory : MonoBehaviour
+{
+    [ReorderableList("Inventory Items")]
+    public List<string> items = new List<string> { "Sword", "Potion" };
+}
+```
+
+- List of complex objects
+
+```csharp
+using CustomAssets.EditorTools;
+using System;
+using System.Collections.Generic;
+
+[Serializable]
+public class Loot { public string id; public int quantity = 1; }
+
+public class LootTable : MonoBehaviour
+{
+    [ReorderableList("Loot Table")]
+    public List<Loot> loot = new List<Loot> { new Loot { id = "gold", quantity = 10 } };
+}
+```
 
 ## License
 

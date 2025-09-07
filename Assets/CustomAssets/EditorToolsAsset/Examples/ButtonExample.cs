@@ -14,7 +14,7 @@ namespace CustomAssets.EditorTools.Examples
         [SerializeField] private string message = "Hello World!";
         [SerializeField] private Color randomColor = Color.white;
 
-        [Header("Settings")]
+        [Title("Settings")]
         [SerializeField] private bool enableLogging = true;
 
         /// <summary>

@@ -16,6 +16,9 @@ Group fields into toolbar-style tabs similar to Odin Inspector's TabGroup, with 
 ### 4. FoldoutGroup Attribute
 Group multiple fields under a single foldout header, similar to Odin Inspector's FoldoutGroup. Fields that share the same group name share one foldout state per-object instance. You can control default expansion and which field draws the header via an optional order.
 
+### 5. SceneReference Attribute
+Show a scene dropdown instead of a string field. You can choose to save as scene name (default) or path, and restrict to Build Settings scenes or list all project scenes.
+
 ### 4. Button Attribute
 Create custom buttons in the Inspector that execute methods directly, with extensive customization options.
 
@@ -299,6 +302,8 @@ Assets/
 │       ├── TabGroupAttribute.cs                    # TabGroup attribute class
 │       ├── FoldoutGroupAttribute.cs                # Foldout group attribute class
 │       ├── ButtonAttribute.cs                      # Button attribute class
+│       ├── FoldoutGroupAttribute.cs                # Foldout group attribute class
+│       ├── SceneReferenceAttribute.cs              # Scene reference attribute class
 │       ├── MinMaxSliderAttribute.cs                # Min–Max slider attribute class
 │       ├── ReorderableListAttribute.cs             # Reorderable list attribute class
 │       ├── ValidateInputAttribute.cs               # ValidateInput attribute class
@@ -316,6 +321,8 @@ Assets/
 │       │   ├── SerializableDictionaryPropertyDrawer.cs # Dictionary property drawer
 │       │   ├── TabGroupPropertyDrawer.cs           # TabGroup property drawer
 │       │   ├── FoldoutGroupPropertyDrawer.cs       # Foldout group property drawer
+│       │   ├── SceneReferencePropertyDrawer.cs     # Scene reference property drawer
+│       │   ├── FoldoutGroupPropertyDrawer.cs       # Foldout group property drawer
 │       │   ├── MinMaxSliderPropertyDrawer.cs       # Min–Max slider property drawer
 │       │   ├── ReorderableListPropertyDrawer.cs    # Reorderable list property drawer
 │       │   ├── ValidateInputPropertyDrawer.cs      # ValidateInput property drawer
@@ -326,6 +333,7 @@ Assets/
 │       │   ├── SerializableDictionaryExample.cs    # Dictionary usage examples
 │       │   ├── TabGroupExample.cs                  # TabGroup usage examples
 │       │   ├── FoldoutGroupExample.cs              # Foldout group usage examples
+│       │   ├── SceneReferenceExample.cs            # Scene reference usage examples
 │       │   ├── MinMaxSliderExample.cs              # MinMaxSlider usage examples
 │       │   ├── ReorderableListExample.cs           # Reorderable list usage examples
 │       │   ├── ValidateInputExample.cs             # ValidateInput usage examples

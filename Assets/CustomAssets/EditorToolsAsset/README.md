@@ -97,10 +97,32 @@ using CustomAssets.EditorTools;
 
 public class GameConfig : MonoBehaviour
 {
-    public StringStringDictionary itemNames = new StringStringDictionary();
+    // Option A: Generic usage (works at runtime and in Inspector via [SerializeReference])
+    [SerializeReference]
+    public SerializableDictionary<string, string> itemNames = new SerializableDictionary<string, string>();
+
+    // Option B: Concrete wrapper types (no [SerializeReference] needed)
     public StringIntDictionary itemPrices = new StringIntDictionary();
 }
 ```
+
+#### Generic Usage (Inspector + Runtime)
+
+```csharp
+using CustomAssets.EditorTools;
+
+public class Localization : MonoBehaviour
+{
+    // Managed reference allows Unity to serialize an open generic instance
+    [SerializeReference]
+    public SerializableDictionary<string, string> localizedTexts = new SerializableDictionary<string, string>();
+}
+```
+
+Notes:
+- Add the attribute `[SerializeReference]` to expose a generic `SerializableDictionary<TKey, TValue>` in the Inspector.
+- Our drawer will instantiate the managed reference automatically if it's null.
+- For AOT/platforms without managed reference support, prefer concrete wrappers.
 
 #### Common Dictionary Types
 

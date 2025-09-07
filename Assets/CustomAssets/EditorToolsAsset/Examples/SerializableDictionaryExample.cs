@@ -11,11 +11,11 @@ namespace CustomAssets.EditorTools.Examples
     {
         [Header("Game Configuration")]
         [Tooltip("Item IDs mapped to their display names")]
-        public StringStringDictionary itemNames = new StringStringDictionary();
-        
+        public SerializableDictionary<string, string> itemNames = new SerializableDictionary<string, string>();
+
         [Tooltip("Item IDs mapped to their prices")]
-        public StringIntDictionary itemPrices = new StringIntDictionary();
-        
+        public SerializableDictionary<string, int> itemPrices = new SerializableDictionary<string, int>();
+
         [Tooltip("Item IDs mapped to their weights")]
         public StringFloatDictionary itemWeights = new StringFloatDictionary();
 
@@ -43,6 +43,11 @@ namespace CustomAssets.EditorTools.Examples
         [Header("Audio")]
         [Tooltip("Sound effect names mapped to their audio clips")]
         public StringAudioClipDictionary soundEffects = new StringAudioClipDictionary();
+
+        [Header("Generic Usage (Runtime + Inspector via SerializeReference)")]
+        [Tooltip("A generic serializable dictionary using TKey,TValue. Uses managed reference to show in Inspector.")]
+        [SerializeReference]
+        public SerializableDictionary<string, string> localizedTexts = new SerializableDictionary<string, string>();
 
         /// <summary>
         /// Called when the script starts.

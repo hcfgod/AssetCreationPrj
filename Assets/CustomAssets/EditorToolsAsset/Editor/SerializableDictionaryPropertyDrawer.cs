@@ -67,6 +67,24 @@ namespace CustomAssets.EditorTools.Editor
         /// <param name="label">The property label.</param>
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
+            // Ensure managed reference instance exists for generic usage with [SerializeReference]
+            if (property.propertyType == SerializedPropertyType.ManagedReference && property.managedReferenceValue == null)
+            {
+                var t = fieldInfo != null ? fieldInfo.FieldType : null;
+                if (t != null && !t.IsAbstract)
+                {
+                    try
+                    {
+                        property.managedReferenceValue = Activator.CreateInstance(t);
+                        property.serializedObject.ApplyModifiedProperties();
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogWarning($"SerializableDictionary: Failed to create instance of {t}: {e.Message}");
+                    }
+                }
+            }
+
             string key = property.propertyPath;
             SerializedProperty keysProperty = property.FindPropertyRelative("keys");
             SerializedProperty valuesProperty = property.FindPropertyRelative("values");

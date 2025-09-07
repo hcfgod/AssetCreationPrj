@@ -455,12 +455,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CustomAssets.EditorTools.Examples.SerializableDictionaryExample
   itemNames:
     keys:
-    - awd
+    - aw
     values:
-    - awd
+    - adwad
   itemPrices:
-    keys: []
-    values: 
+    keys:
+    - awdad
+    values: 7b000000
   itemWeights:
     keys:
     - wea
@@ -487,6 +488,16 @@ MonoBehaviour:
   soundEffects:
     keys: []
     values: []
+  localizedTexts:
+    rid: 5723768522638884922
+  references:
+    version: 2
+    RefIds:
+    - rid: 5723768522638884922
+      type: {class: 'SerializableDictionary`2[[System.String, mscorlib],[System.String, mscorlib]]', ns: CustomAssets.EditorTools, asm: Assembly-CSharp}
+      data:
+        keys: []
+        values: []
 --- !u!114 &814717950
 MonoBehaviour:
   m_ObjectHideFlags: 0

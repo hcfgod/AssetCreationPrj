@@ -13,6 +13,7 @@ namespace CustomAssets.EditorTools.Editor
     internal static class EditorGlobalShortcuts
     {
         private static EditorWindow _tempProjectPopup;
+        private static ToolbarSearchField _searchFieldRef;
 
         // Ctrl+Space on Windows, Cmd+Space on macOS (Action modifier maps accordingly)
         [Shortcut("EditorTools/Show Project Window (Popup)", KeyCode.Space, ShortcutModifiers.Action)]
@@ -130,6 +131,7 @@ namespace CustomAssets.EditorTools.Editor
                 title.style.flexShrink = 0;
 
                 var search = new ToolbarSearchField();
+                _searchFieldRef = search;
                 search.style.flexGrow = 1;
                 search.style.flexShrink = 1;
                 search.style.minWidth = 0; // allow shrinking within row
@@ -165,16 +167,26 @@ namespace CustomAssets.EditorTools.Editor
                 // Insert at top so it pushes content down
                 root.Insert(0, header);
 
-                // Hook search change -> select matching assets in Project
+                // As-you-type: update Project Browser filter without changing selection
                 search.RegisterValueChangedCallback(evt =>
                 {
-                    ApplyProjectSearch(evt.newValue);
+                    UpdateProjectSearchText(evt.newValue);
                 });
+
+                // Keyboard: Ctrl/Cmd+Enter to select/ping; ESC to close
                 search.RegisterCallback<KeyDownEvent>(evt =>
                 {
                     if (evt.keyCode == KeyCode.Escape)
                     {
                         if (_tempProjectPopup != null) { _tempProjectPopup.Close(); _tempProjectPopup = null; }
+                        evt.StopImmediatePropagation();
+                    }
+                    else if ((evt.keyCode == KeyCode.Return || evt.keyCode == KeyCode.KeypadEnter) && (evt.actionKey || evt.ctrlKey))
+                    {
+                        var q = search.value;
+                        ApplyProjectSearch(q, ping: true);
+                        // Return focus to search field after selection/ping effects
+                        EditorApplication.delayCall += () => { if (_searchFieldRef != null) _searchFieldRef.Focus(); };
                         evt.StopImmediatePropagation();
                     }
                 });
@@ -235,7 +247,7 @@ namespace CustomAssets.EditorTools.Editor
             }
         }
 
-        private static void ApplyProjectSearch(string query)
+        private static void ApplyProjectSearch(string query, bool ping)
         {
             if (query == null) query = string.Empty;
             query = query.Trim();
@@ -255,12 +267,56 @@ namespace CustomAssets.EditorTools.Editor
                                 .Where(o => o != null)
                                 .ToArray();
                 Selection.objects = objs;
-                if (objs.Length > 0)
+                if (ping && objs.Length > 0)
                 {
                     EditorGUIUtility.PingObject(objs[0]);
                 }
             }
             catch { }
+        }
+
+        private static void UpdateProjectSearchText(string query)
+        {
+            try
+            {
+                if (_tempProjectPopup == null) return;
+                var w = _tempProjectPopup;
+                var t = w.GetType();
+                // Try reflection method first (SetSearch)
+                var mi = t.GetMethod("SetSearch", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic, null, new[] { typeof(string) }, null);
+                if (mi != null)
+                {
+                    mi.Invoke(w, new object[] { query });
+                    w.Repaint();
+                    return;
+                }
+                // Try property 'searchString'
+                var pi = t.GetProperty("searchString", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+                if (pi != null && pi.CanWrite)
+                {
+                    pi.SetValue(w, query);
+                    w.Repaint();
+                    return;
+                }
+                // Try to find a UIElements search field inside the content (skip our header at index 0)
+                var root = w.rootVisualElement;
+                if (root != null)
+                {
+                    VisualElement content = root.childCount > 1 ? root[1] : root;
+                    var innerSearch = content.Q<ToolbarSearchField>();
+                    if (innerSearch != null)
+                    {
+                        innerSearch.value = query;
+                        w.Repaint();
+                    }
+                }
+            }
+            catch { }
+            finally
+            {
+                // Keep focus on our search bar to avoid intrusive focus changes
+                EditorApplication.delayCall += () => { if (_searchFieldRef != null) _searchFieldRef.Focus(); };
+            }
         }
 
 #if UNITY_EDITOR_WIN

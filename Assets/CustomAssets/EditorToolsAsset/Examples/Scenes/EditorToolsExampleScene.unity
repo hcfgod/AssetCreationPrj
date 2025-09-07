@@ -1099,6 +1099,7 @@ GameObject:
   - component: {fileID: 1319207156}
   - component: {fileID: 1319207155}
   - component: {fileID: 1319207154}
+  - component: {fileID: 1319207158}
   m_Layer: 0
   m_Name: TestGameobject
   m_TagString: Untagged
@@ -1240,6 +1241,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1319207158
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1319207153}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94117a272591dd149bdb17b091432eeb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomAssets.EditorTools.Examples.MinMaxSliderExample
+  spawnTimeRange: {x: 0.24, y: 0.81}
+  levelRange: {x: 10, y: 40}
+  speedLimits: {x: 12.912547, y: 36.692017}
 --- !u!1 &1776224341
 GameObject:
   m_ObjectHideFlags: 0
@@ -1599,6 +1615,6 @@ SceneRoots:
   m_Roots:
   - {fileID: 410087041}
   - {fileID: 832575519}
-  - {fileID: 1319207157}
   - {fileID: 2079609780}
   - {fileID: 30525766}
+  - {fileID: 1319207157}

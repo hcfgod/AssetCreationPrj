@@ -15,6 +15,13 @@ namespace CustomAssets.EditorTools.Editor
         private static EditorWindow _tempProjectPopup;
         private static ToolbarSearchField _searchFieldRef;
 
+        // Static init to handle assembly reloads cleanly
+        static EditorGlobalShortcuts()
+        {
+            AssemblyReloadEvents.beforeAssemblyReload += OnBeforeAssemblyReload;
+            AssemblyReloadEvents.afterAssemblyReload += OnAfterAssemblyReload;
+        }
+
         // Ctrl+Space on Windows, Cmd+Space on macOS (Action modifier maps accordingly)
         [Shortcut("EditorTools/Show Project Window (Popup)", KeyCode.Space, ShortcutModifiers.Action)]
         private static void ShowProjectWindowPopup()
@@ -24,6 +31,7 @@ namespace CustomAssets.EditorTools.Editor
             {
                 try { _tempProjectPopup.Close(); } catch { }
                 _tempProjectPopup = null;
+                CleanupCallbacks();
                 return;
             }
 
@@ -95,7 +103,12 @@ namespace CustomAssets.EditorTools.Editor
             {
                 try { _tempProjectPopup.Close(); } catch { }
                 _tempProjectPopup = null;
-                EditorApplication.update -= AutoCloseIfLostFocus;
+                CleanupCallbacks();
+            }
+            else
+            {
+                // Ensure header exists (domain reloads can rebuild UI)
+                TryInstallHeaderBar(_tempProjectPopup);
             }
         }
 
@@ -231,7 +244,12 @@ namespace CustomAssets.EditorTools.Editor
 
         private static void DragUpdate()
         {
-            if (!_isDragging || _dragWindow == null) return;
+            if (!_isDragging || _dragWindow == null)
+            {
+                // stop if window disappeared
+                EditorApplication.update -= DragUpdate;
+                return;
+            }
             Vector2 mouse = GetMouseScreenPositionFallback();
             if (mouse.x < 0 || mouse.y < 0) return;
             Vector2 newPos = mouse - _dragOffsetScreen;
@@ -317,6 +335,54 @@ namespace CustomAssets.EditorTools.Editor
                 // Keep focus on our search bar to avoid intrusive focus changes
                 EditorApplication.delayCall += () => { if (_searchFieldRef != null) _searchFieldRef.Focus(); };
             }
+        }
+
+        private static void OnBeforeAssemblyReload()
+        {
+            // Close any of our popups to avoid stranded windows after reload
+            AutoCloseIfLostFocus();
+            CloseOurProjectPopups();
+            CleanupCallbacks();
+            _tempProjectPopup = null;
+            _dragWindow = null;
+            _isDragging = false;
+        }
+
+        private static void OnAfterAssemblyReload()
+        {
+            // Ensure no orphaned popup persists without our header
+            AutoCloseIfLostFocus();
+            CloseOurProjectPopups();
+            _tempProjectPopup = null;
+            _dragWindow = null;
+            _isDragging = false;
+        }
+
+        private static void CleanupCallbacks()
+        {
+            EditorApplication.update -= AutoCloseIfLostFocus;
+            EditorApplication.update -= DragUpdate;
+        }
+
+        private static void CloseOurProjectPopups()
+        {
+            try
+            {
+                var projectBrowserType = Type.GetType("UnityEditor.ProjectBrowser, UnityEditor");
+                if (projectBrowserType == null) return;
+                var objs = Resources.FindObjectsOfTypeAll(projectBrowserType);
+                foreach (var o in objs)
+                {
+                    var w = o as EditorWindow;
+                    if (w == null) continue;
+                    var root = w.rootVisualElement;
+                    if (root != null && root.Q("ProjectPopupHeader") != null)
+                    {
+                        try { w.Close(); } catch { }
+                    }
+                }
+            }
+            catch { }
         }
 
 #if UNITY_EDITOR_WIN

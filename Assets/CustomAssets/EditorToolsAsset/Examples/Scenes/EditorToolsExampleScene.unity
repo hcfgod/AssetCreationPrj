@@ -1476,7 +1476,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: baa31bb1dde8d7d4697ce50ad463abcb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CustomAssets.EditorTools.Examples.ProgressBarExample
-  health: 66
+  health: 98
   charge: 0.64
   loading: 0.3
 --- !u!114 &1319207171

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEditorInternal;
@@ -65,6 +66,7 @@ namespace CustomAssets.EditorTools.Editor
             return property.isArray && property.propertyType != SerializedPropertyType.String;
         }
 
+
         private ListCache GetOrCreateList(SerializedProperty property, GUIContent label)
         {
             var key = BuildKey(property);
@@ -89,14 +91,21 @@ namespace CustomAssets.EditorTools.Editor
                 return new ListCache();
             }
 
-            var list = new ReorderableList(property.serializedObject, property, attr.Draggable, true, attr.ShowAdd, attr.ShowRemove);
+            // Only draw an internal header if the attribute explicitly provides one.
+            bool explicitHeader = !string.IsNullOrEmpty(attr.Header);
+            bool displayHeader = explicitHeader;
 
-            // Header
-            var headerLabel = new GUIContent(string.IsNullOrEmpty(attr.Header) ? label.text : attr.Header);
-            list.drawHeaderCallback = rect =>
+            var list = new ReorderableList(property.serializedObject, property, attr.Draggable, displayHeader, attr.ShowAdd, attr.ShowRemove);
+
+            // Header (only when explicitly requested via attribute)
+            if (displayHeader)
             {
-                EditorGUI.LabelField(rect, $"{headerLabel.text} ({property.arraySize})", EditorStyles.boldLabel);
-            };
+                var headerLabel = new GUIContent(attr.Header);
+                list.drawHeaderCallback = rect =>
+                {
+                    EditorGUI.LabelField(rect, $"{headerLabel.text} ({property.arraySize})", EditorStyles.boldLabel);
+                };
+            }
 
             // Element drawer with variable height
             list.drawElementCallback = (rect, index, isActive, isFocused) =>
@@ -149,7 +158,7 @@ namespace CustomAssets.EditorTools.Editor
                 SO = property.serializedObject,
                 Property = property.Copy(),
                 Options = attr,
-                HeaderLabel = headerLabel
+                HeaderLabel = explicitHeader ? new GUIContent(attr.Header) : null
             };
             _listsByKey[key] = cache;
             return cache;

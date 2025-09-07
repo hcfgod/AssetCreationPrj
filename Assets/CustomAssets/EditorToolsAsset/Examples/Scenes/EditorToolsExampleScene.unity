@@ -1257,7 +1257,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CustomAssets.EditorTools.Examples.MinMaxSliderExample
   spawnTimeRange: {x: 0.24, y: 0.81}
   levelRange: {x: 10, y: 40}
-  speedLimits: {x: 12.912547, y: 36.692017}
+  speedLimits: {x: 18.866745, y: 40.050797}
 --- !u!114 &1319207159
 MonoBehaviour:
   m_ObjectHideFlags: 0

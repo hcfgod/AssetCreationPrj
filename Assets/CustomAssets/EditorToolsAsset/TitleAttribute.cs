@@ -21,7 +21,7 @@ namespace CustomAssets.EditorTools
     /// public string weaponName = "Sword";
     /// </code>
     /// </example>
-    public class TitleAttribute : PropertyAttribute
+    public class TitleAttribute : HeaderAttribute
     {
         /// <summary>
         /// The title text to display.
@@ -52,7 +52,7 @@ namespace CustomAssets.EditorTools
         /// Initializes a new instance of the TitleAttribute with default styling.
         /// </summary>
         /// <param name="title">The title text to display.</param>
-        public TitleAttribute(string title)
+        public TitleAttribute(string title) : base(title)
         {
             Title = title;
             TitleColor = Color.white;
@@ -66,7 +66,7 @@ namespace CustomAssets.EditorTools
         /// </summary>
         /// <param name="title">The title text to display.</param>
         /// <param name="color">The color of the title text.</param>
-        public TitleAttribute(string title, Color color)
+        public TitleAttribute(string title, Color color) : base(title)
         {
             Title = title;
             TitleColor = color;
@@ -80,7 +80,7 @@ namespace CustomAssets.EditorTools
         /// </summary>
         /// <param name="title">The title text to display.</param>
         /// <param name="hexColor">The hex color string (e.g., "#FF6B6B").</param>
-        public TitleAttribute(string title, string hexColor)
+        public TitleAttribute(string title, string hexColor) : base(title)
         {
             Title = title;
             TitleColor = ParseHexColor(hexColor);
@@ -95,7 +95,7 @@ namespace CustomAssets.EditorTools
         /// <param name="title">The title text to display.</param>
         /// <param name="color">The color of the title text.</param>
         /// <param name="fontSize">The font size of the title text.</param>
-        public TitleAttribute(string title, Color color, int fontSize)
+        public TitleAttribute(string title, Color color, int fontSize) : base(title)
         {
             Title = title;
             TitleColor = color;
@@ -110,7 +110,7 @@ namespace CustomAssets.EditorTools
         /// <param name="title">The title text to display.</param>
         /// <param name="hexColor">The hex color string (e.g., "#FF6B6B").</param>
         /// <param name="fontSize">The font size of the title text.</param>
-        public TitleAttribute(string title, string hexColor, int fontSize)
+        public TitleAttribute(string title, string hexColor, int fontSize) : base(title)
         {
             Title = title;
             TitleColor = ParseHexColor(hexColor);
@@ -127,7 +127,7 @@ namespace CustomAssets.EditorTools
         /// <param name="fontSize">The font size of the title text.</param>
         /// <param name="showSeparator">Whether to show a separator line below the title.</param>
         /// <param name="separatorColor">The color of the separator line.</param>
-        public TitleAttribute(string title, Color color, int fontSize, bool showSeparator, Color separatorColor)
+        public TitleAttribute(string title, Color color, int fontSize, bool showSeparator, Color separatorColor) : base(title)
         {
             Title = title;
             TitleColor = color;

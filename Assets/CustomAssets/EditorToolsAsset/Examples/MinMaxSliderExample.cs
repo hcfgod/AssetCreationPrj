@@ -4,11 +4,11 @@ namespace CustomAssets.EditorTools.Examples
 {
     public class MinMaxSliderExample : MonoBehaviour
     {
-        [Title("Float Range [0..1]")]
+        [Title("Float Range [0..1]", "#4ECDC4")]
         [MinMaxSlider(0f, 1f)]
         public Vector2 spawnTimeRange = new Vector2(0.2f, 0.8f);
 
-        [Title("Int Range [0..100]")]
+        [Header("Int Range [0..100]")]
         [MinMaxSlider(0, 100)]
         public Vector2Int levelRange = new Vector2Int(10, 40);
 

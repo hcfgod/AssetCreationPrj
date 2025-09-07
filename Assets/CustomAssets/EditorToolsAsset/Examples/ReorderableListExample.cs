@@ -13,7 +13,7 @@ namespace CustomAssets.EditorTools.Examples
             public int quantity = 1;
         }
 
-        [Header("Array of ints")]
+        [Title("This is an Array of ints", "#4ECDC4")]
         [ReorderableList]
         public int[] levels = new[] { 1, 2, 3 };
 
@@ -21,7 +21,7 @@ namespace CustomAssets.EditorTools.Examples
         [ReorderableList("Inventory Items")]
         public List<string> items = new List<string> { "Sword", "Potion" };
 
-        [Header("List of complex objects")]
+        [Title("List of complex objects")]
         [ReorderableList("Loot Table")]
         public List<Loot> loot = new List<Loot> { new Loot { id = "gold", quantity = 10 } };
     }

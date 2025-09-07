@@ -1476,7 +1476,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: baa31bb1dde8d7d4697ce50ad463abcb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CustomAssets.EditorTools.Examples.ProgressBarExample
-  health: 75
+  health: 66
   charge: 0.64
   loading: 0.3
 --- !u!114 &1319207171
@@ -1495,6 +1495,7 @@ MonoBehaviour:
   texture: {fileID: 2800000, guid: 7299335822211614ba0371ee22e46641, type: 3}
   material: {fileID: 15303, guid: 0000000000000000f000000000000000, type: 0}
   prefab: {fileID: 919132149155446097, guid: 40d858de9feef3f409a24c4c04668931, type: 3}
+  assetPath: 
 --- !u!1 &1776224341
 GameObject:
   m_ObjectHideFlags: 0

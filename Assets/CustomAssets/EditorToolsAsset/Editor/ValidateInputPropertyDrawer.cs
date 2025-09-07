@@ -93,7 +93,6 @@ namespace CustomAssets.EditorTools.Editor
             object value = GetFieldValue(target, property);
 
             // Find validator method
-            var flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
             Type targetType = target.GetType();
             MethodInfo method = FindValidatorMethod(targetType, attr.MethodName, fieldInfo.FieldType) ??
                                 FindValidatorMethod(targetType, attr.MethodName, typeof(object));

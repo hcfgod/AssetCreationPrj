@@ -37,7 +37,7 @@ public class Example : MonoBehaviour
 ```
 
 ## Feature Summary (at a glance)
-- Layout & UX: Title, InfoBox, ProgressBar, FoldoutGroup, TabGroup, ReorderableList
+- Layout & UX: Title, InfoBox, ProgressBar, AssetPreview, FoldoutGroup, TabGroup, ReorderableList
 - Data & Validation: SerializableDictionary, ValidateInput (+ Min/Max/Range/Regex/NotNull/NotEmpty/NonZero), MinMaxSlider
 - Actions: Button (invoke methods safely from the Inspector)
 - Project-aware: SceneReference, TagSelector, LayerSelector, LayerMaskSelector, ShowIf/HideIf, ReadOnly
@@ -148,6 +148,18 @@ Examples
 ```csharp
 [ProgressBar(0, 100, label: "Health", hexColor: "#FF6B6B")] public int health;
 [ProgressBar(0f, 1f, label: "Charge", hexColor: "#4ECDC4")] public float charge;
+```
+
+### AssetPreview Attribute
+Show a thumbnail/preview of object reference fields (Sprite, Texture2D, Material, Prefab, etc.). Optionally show the object field above the preview and control the preview size.
+
+Examples
+
+```csharp
+[AssetPreview(96, 96)] public Sprite sprite;
+[AssetPreview(128, 72)] public Texture2D texture;
+[AssetPreview(128, 128)] public Material material;
+[AssetPreview(128, 96)] public GameObject prefab;
 ```
 
 ### Reorderable List
@@ -432,6 +444,7 @@ Assets/
 │       ├── InfoBoxAttribute.cs                     # Info box attribute
 │       ├── MinMaxSliderAttribute.cs                # Min–Max slider attribute class
 │       ├── ProgressBarAttribute.cs                 # Progress bar attribute class
+│       ├── AssetPreviewAttribute.cs                # Asset preview attribute class
 │       ├── ReorderableListAttribute.cs             # Reorderable list attribute class
 │       ├── ValidateInputAttribute.cs               # ValidateInput attribute class
 │       ├── MinValueAttribute.cs                    # Convenience validators (numeric)
@@ -456,6 +469,7 @@ Assets/
 │       │   ├── FoldoutGroupPropertyDrawer.cs       # Foldout group property drawer
 │       │   ├── MinMaxSliderPropertyDrawer.cs       # Min–Max slider property drawer
 │       │   ├── ProgressBarPropertyDrawer.cs        # Progress bar property drawer
+│       │   ├── AssetPreviewPropertyDrawer.cs       # Asset preview property drawer
 │       │   ├── ReorderableListPropertyDrawer.cs    # Reorderable list property drawer
 │       │   ├── ValidateInputPropertyDrawer.cs      # ValidateInput property drawer
 │       │   └── ButtonEditor.cs                     # Button editor
@@ -473,6 +487,7 @@ Assets/
 │       │   ├── MinMaxSliderExample.cs              # MinMaxSlider usage examples
 │       │   ├── ReorderableListExample.cs           # Reorderable list usage examples
 │       │   ├── ProgressBarExample.cs               # ProgressBar usage examples
+│       │   ├── AssetPreviewExample.cs              # AssetPreview usage examples
 │       │   ├── ValidateInputExample.cs             # ValidateInput usage examples
 │       │   └── ValidateConvenienceExample.cs       # Convenience validators usage examples
 │       └── README.md                               # This documentation

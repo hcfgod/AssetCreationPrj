@@ -396,6 +396,7 @@ GameObject:
   - component: {fileID: 814717949}
   - component: {fileID: 814717950}
   - component: {fileID: 814717951}
+  - component: {fileID: 814717952}
   m_Layer: 0
   m_Name: TestGameobject
   m_TagString: Untagged
@@ -541,8 +542,40 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CustomAssets.EditorTools.Examples.ButtonExample
   counter: 0
   message: Hello World!
-  randomColor: {r: 0.69287443, g: 0.09018457, b: 0.9237914, a: 1}
+  randomColor: {r: 0.41357893, g: 0.028396726, b: 0.9147357, a: 1}
   enableLogging: 1
+--- !u!114 &814717952
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 814717946}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 092c180b7c8aba64e9aabcad781cd0cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomAssets.EditorTools.Examples.ConditionalExample
+  showAdvancedSettings: 0
+  advancedValue: 1
+  basicMessage: Basic settings are visible
+  health: 100
+  maxHealthMessage: At full health!
+  deathMessage: Player is dead!
+  aliveMessage: Player is alive!
+  playerType: 0
+  adminOnlySetting: 1
+  loggedInOnlySetting: 1
+  playerName: Keith
+  welcomeMessage: Welcome
+  dynamicWelcomeMessage: Welcome, Keith!
+  enterNameMessage: Please enter your name
+  buttonSectionTitle: Welcome Message Controls
+  enableComplexMode: 0
+  complexityLevel: 1
+  complexModeMessage: Complex mode is active
+  maxComplexityMessage: Maximum complexity reached!
+  simpleModeMessage: Simple mode is active
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0

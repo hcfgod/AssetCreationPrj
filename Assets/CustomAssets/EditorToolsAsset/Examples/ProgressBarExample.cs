@@ -6,7 +6,7 @@ namespace CustomAssets.EditorTools.Examples
     {
         [Title("Health", "#FF6B6B")]
         [RangeValue(0, 100)]
-        [ProgressBar(0, 100, label: "Health", hexColor: "#FF6B6B", height: 18f)]
+        [ProgressBar(0, 100, label: "Health", hexColor: "#FF6B6B", height: 18f, showValue: true, editable: true)]
         public int health = 75;
 
         [Title("Charge", "#4ECDC4")]
@@ -19,4 +19,3 @@ namespace CustomAssets.EditorTools.Examples
         public float loading = 0.3f;
     }
 }
-

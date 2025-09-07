@@ -3,8 +3,8 @@ using UnityEngine;
 namespace CustomAssets.EditorTools
 {
     /// <summary>
-    /// Draws a non-editable progress bar for numeric fields (int or float).
-    /// Configure min/max range, color, height, and optional label/value display.
+    /// Draws a progress bar for numeric fields (int or float).
+    /// Configure min/max range, color, height, optional label/value display, and optional editability.
     /// </summary>
     public class ProgressBarAttribute : PropertyAttribute
     {
@@ -14,17 +14,12 @@ namespace CustomAssets.EditorTools
         public Color BarColor { get; }
         public float Height { get; }
         public bool ShowValue { get; }
+        public bool Editable { get; }
 
         /// <summary>
         /// Progress bar with hex color specification.
         /// </summary>
-        /// <param name="min">Minimum expected value.</param>
-        /// <param name="max">Maximum expected value.</param>
-        /// <param name="label">Optional label override; null uses property display name.</param>
-        /// <param name="hexColor">Bar color as hex string (e.g., "#4ECDC4").</param>
-        /// <param name="height">Bar height in pixels (default 18).</param>
-        /// <param name="showValue">Whether to show percentage text.</param>
-        public ProgressBarAttribute(float min = 0f, float max = 1f, string label = null, string hexColor = "#4ECDC4", float height = 18f, bool showValue = true)
+        public ProgressBarAttribute(float min = 0f, float max = 1f, string label = null, string hexColor = "#4ECDC4", float height = 18f, bool showValue = true, bool editable = false)
         {
             Min = min;
             Max = max;
@@ -32,12 +27,13 @@ namespace CustomAssets.EditorTools
             BarColor = ParseHexColor(hexColor);
             Height = Mathf.Max(12f, height);
             ShowValue = showValue;
+            Editable = editable;
         }
 
         /// <summary>
         /// Progress bar with UnityEngine.Color specification.
         /// </summary>
-        public ProgressBarAttribute(float min, float max, string label, Color color, float height = 18f, bool showValue = true)
+        public ProgressBarAttribute(float min, float max, string label, Color color, float height = 18f, bool showValue = true, bool editable = false)
         {
             Min = min;
             Max = max;
@@ -45,6 +41,7 @@ namespace CustomAssets.EditorTools
             BarColor = color;
             Height = Mathf.Max(12f, height);
             ShowValue = showValue;
+            Editable = editable;
         }
 
         private static Color ParseHexColor(string hexColor)

@@ -7,7 +7,6 @@ namespace CustomAssets.EditorTools.Editor
     public class AssetPreviewPropertyDrawer : PropertyDrawer
     {
         private const float Spacing = 2f;
-        private static readonly Color kBack = new Color(0.16f, 0.16f, 0.16f, 0.5f);
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
@@ -23,48 +22,59 @@ namespace CustomAssets.EditorTools.Editor
         {
             var attr = (AssetPreviewAttribute)attribute;
 
-            // Only object references supported
-            if (property.propertyType != SerializedPropertyType.ObjectReference)
-            {
-                EditorGUI.PropertyField(position, property, label, true);
-                return;
-            }
-
             EditorGUI.BeginProperty(position, label, property);
 
             float y = position.y;
+            Object obj = null;
 
-            // Optional object field
-            if (attr.ShowObjectField)
+            // Optional object field and object resolution
+            if (property.propertyType == SerializedPropertyType.ObjectReference)
             {
-                Rect fieldRect = new Rect(position.x, y, position.width, EditorGUIUtility.singleLineHeight);
-                var fieldType = fieldInfo != null ? fieldInfo.FieldType : typeof(UnityEngine.Object);
-                Object newObj = EditorGUI.ObjectField(fieldRect, label, property.objectReferenceValue, fieldType, attr.AllowSceneObjects);
-                if (newObj != property.objectReferenceValue)
+                if (attr.ShowObjectField)
                 {
-                    property.objectReferenceValue = newObj;
+                    Rect fieldRect = new Rect(position.x, y, position.width, EditorGUIUtility.singleLineHeight);
+                    var fieldType = fieldInfo != null ? fieldInfo.FieldType : typeof(UnityEngine.Object);
+                    Object newObj = EditorGUI.ObjectField(fieldRect, label, property.objectReferenceValue, fieldType, attr.AllowSceneObjects);
+                    if (newObj != property.objectReferenceValue)
+                    {
+                        property.objectReferenceValue = newObj;
+                    }
+                    y += EditorGUIUtility.singleLineHeight + Spacing;
                 }
-                y += EditorGUIUtility.singleLineHeight + Spacing;
+                obj = property.objectReferenceValue;
+            }
+            else if (property.propertyType == SerializedPropertyType.String)
+            {
+                string currentPath = property.stringValue ?? string.Empty;
+                Object currentObject = !string.IsNullOrEmpty(currentPath) ? AssetDatabase.LoadMainAssetAtPath(currentPath) : null;
+                if (attr.ShowObjectField)
+                {
+                    Rect fieldRect = new Rect(position.x, y, position.width, EditorGUIUtility.singleLineHeight);
+                    Object picked = EditorGUI.ObjectField(fieldRect, label, currentObject, typeof(Object), false);
+                    if (picked != currentObject)
+                    {
+                        property.stringValue = picked != null ? AssetDatabase.GetAssetPath(picked) : string.Empty;
+                        currentObject = picked;
+                    }
+                    y += EditorGUIUtility.singleLineHeight + Spacing;
+                }
+                obj = currentObject;
+            }
+            else
+            {
+                // Fallback for unsupported types
+                EditorGUI.PropertyField(position, property, label, true);
+                EditorGUI.EndProperty();
+                return;
             }
 
             Rect previewRect = new Rect(position.x, y, position.width, attr.Height);
 
             // Draw background
-            EditorGUI.DrawRect(previewRect, kBack);
-
-            // Compute centered draw rect
-            float targetW = Mathf.Min(attr.Width, previewRect.width);
-            float targetH = Mathf.Min(attr.Height, previewRect.height);
-            Rect imgRect = new Rect(
-                previewRect.x + (previewRect.width - targetW) * 0.5f,
-                previewRect.y + (previewRect.height - targetH) * 0.5f,
-                targetW,
-                targetH
-            );
+            EditorGUI.DrawRect(previewRect, attr.BackgroundColor);
 
             // Fetch preview texture (fallback to mini thumbnail)
             Texture2D tex = null;
-            var obj = property.objectReferenceValue;
             if (obj != null)
             {
                 tex = AssetPreview.GetAssetPreview(obj) as Texture2D;
@@ -76,7 +86,31 @@ namespace CustomAssets.EditorTools.Editor
 
             if (tex != null)
             {
-                GUI.DrawTexture(imgRect, tex, ScaleMode.ScaleToFit, true);
+                // Compute draw rect (keep aspect vs fill)
+                Rect imgRect = previewRect;
+                if (attr.KeepAspect)
+                {
+                    float texAspect = (tex.height > 0) ? (float)tex.width / tex.height : 1f;
+                    float rectAspect = previewRect.width / Mathf.Max(1f, previewRect.height);
+                    if (texAspect > rectAspect)
+                    {
+                        // fit width
+                        float h = previewRect.width / Mathf.Max(0.0001f, texAspect);
+                        imgRect = new Rect(previewRect.x, previewRect.y + (previewRect.height - h) * 0.5f, previewRect.width, h);
+                    }
+                    else
+                    {
+                        // fit height
+                        float w = previewRect.height * texAspect;
+                        imgRect = new Rect(previewRect.x + (previewRect.width - w) * 0.5f, previewRect.y, w, previewRect.height);
+                    }
+                }
+
+                // Apply tint
+                var prevColor = GUI.color;
+                GUI.color = attr.TintColor;
+                GUI.DrawTexture(imgRect, tex, attr.KeepAspect ? ScaleMode.ScaleToFit : ScaleMode.StretchToFill, true);
+                GUI.color = prevColor;
             }
             else
             {
@@ -87,12 +121,15 @@ namespace CustomAssets.EditorTools.Editor
                 };
                 string msg = obj == null ? "No Asset" : "Generating Preview...";
                 EditorGUI.LabelField(previewRect, msg, style);
-                // Hint editor to repaint so preview can appear when ready
                 if (obj != null)
-                    EditorApplication.delayCall += () => {
+                {
+                    // Hint editor to repaint so preview can appear when ready
+                    EditorApplication.delayCall += () =>
+                    {
                         var window = EditorWindow.focusedWindow;
                         if (window != null) window.Repaint();
                     };
+                }
             }
 
             EditorGUI.EndProperty();

@@ -5,7 +5,7 @@ namespace KCharacterControler.Editor
 {
     public static class CharacterFactoryEditor
     {
-        private const string PATH = "GameObject/ECM2/";
+        private const string PATH = "GameObject/KCharacterController/";
         private const int PRIORITY = 1;
 
         private static void InitPhysicsBody(GameObject go)

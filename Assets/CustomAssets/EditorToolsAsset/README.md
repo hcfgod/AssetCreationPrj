@@ -141,25 +141,35 @@ Create colored titles and headers in the Inspector with custom styling, font siz
 A custom attribute that allows you to display and edit a float or int value as a min-max slider in the Unity Inspector. This attribute lets you define a range (minimum and maximum limits) and exposes two fields (min and max) as a draggable slider, making it easy to select value ranges for things like spawn areas, stat ranges, or configurable thresholds. The MinMaxSlider attribute supports both float and int types, and provides a clear, user-friendly interface for range selection directly in the Inspector.
 
 ### ProgressBar Attribute
-Displays a non-editable progress bar for int and float fields. Configure the min/max range, color, height, and whether to show the percentage value inside the bar. Useful for visualizing health, charge, loading, or any normalized metric.
+Displays a progress bar for int and float fields. Configure the min/max range, color, height, label, show percentage, and optionally make it editable by clicking/dragging on the bar.
 
 Examples
 
 ```csharp
-[ProgressBar(0, 100, label: "Health", hexColor: "#FF6B6B")] public int health;
-[ProgressBar(0f, 1f, label: "Charge", hexColor: "#4ECDC4")] public float charge;
+// Editable integer bar
+[ProgressBar(0, 100, label: "Health", hexColor: "#FF6B6B", height: 18f, showValue: true, editable: true)] public int health;
+
+// Read-only float bar
+[ProgressBar(0f, 1f, label: "Charge", hexColor: "#4ECDC4", height: 18f)] public float charge;
 ```
 
 ### AssetPreview Attribute
 Show a thumbnail/preview of object reference fields (Sprite, Texture2D, Material, Prefab, etc.). Optionally show the object field above the preview and control the preview size.
 
+Features
+- Custom background color and texture tint
+- Keep aspect ratio or fill the preview rect
+- Supports string path fields by resolving assets via AssetDatabase
+
 Examples
 
 ```csharp
-[AssetPreview(96, 96)] public Sprite sprite;
-[AssetPreview(128, 72)] public Texture2D texture;
-[AssetPreview(128, 128)] public Material material;
-[AssetPreview(128, 96)] public GameObject prefab;
+// Object references with custom options
+[AssetPreview(96, 96, showObjectField: true, allowSceneObjects: false, backgroundHex: "#222222", tintHex: "#FFFFFF", keepAspect: true)] public Sprite sprite;
+[AssetPreview(128, 72, showObjectField: true, allowSceneObjects: false, backgroundHex: "#1E1E1E", tintHex: "#4ECDC4", keepAspect: false)] public Texture2D texture;
+
+// String path — choose asset via object picker, stores the asset path string
+[AssetPreview(96, 96, showObjectField: true)] public string assetPath;
 ```
 
 ### Reorderable List

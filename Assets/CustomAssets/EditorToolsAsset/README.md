@@ -1,8 +1,53 @@
 # Editor Tools Asset
 
-A collection of Unity editor tools that enhance the Inspector experience and provide reusable functionality for game development.
+High-quality, production-ready Inspector tools for Unity projects. This package adds powerful, unobtrusive attributes and editors that accelerate iteration, improve clarity, and standardize workflows across large teams.
 
-## Tools Included
+- Zero runtime overhead (editor-only except where noted)
+- Battle-tested patterns aligned to AAA workflows (clarity, determinism, guardrails)
+- Drop-in usage; works with existing MonoBehaviours, ScriptableObjects, and assemblies
+
+## Compatibility & Requirements
+- Unity 2022.3 LTS or newer (Unity 6+ recommended). Tested on 6000.2.2f1.
+- Editor-only by default. Some attributes provide runtime data (e.g., SerializableDictionary) — noted per feature.
+
+## Installation
+1) Copy the `Assets/CustomAssets/EditorToolsAsset/` folder into your project (keep folder structure).
+2) Ensure all editor scripts remain under `Editor/` subfolders.
+3) Open any example script under `Examples/` to see usage patterns.
+
+## Quick Start
+Add the attribute that solves your immediate need — no additional setup required.
+
+```csharp
+using CustomAssets.EditorTools;
+
+public class Example : MonoBehaviour
+{
+    [Title("Player Settings", "#4ECDC4")]
+    [InfoBox("Speed is clamped at 1..20", InfoBoxType.Info)]
+    [RangeValue(1, 20)]
+    public float speed = 5f;
+
+    [FoldoutGroup("Combat")] public int damage = 10;
+    [FoldoutGroup("Combat")] public bool canCrit = true;
+
+    [SceneReference] public string mainMenuScene;        // from Build Settings by name
+    [ReorderableList("Tags")] public string[] tags;     // drag, add, remove
+}
+```
+
+## Feature Summary (at a glance)
+- Layout & UX: Title, InfoBox, FoldoutGroup, TabGroup, ReorderableList
+- Data & Validation: SerializableDictionary, ValidateInput (+ Min/Max/Range/Regex/NotNull/NotEmpty/NonZero), MinMaxSlider
+- Actions: Button (invoke methods safely from the Inspector)
+- Project-aware: SceneReference (string or SceneAsset), ShowIf/HideIf, ReadOnly
+
+## Examples
+See `Assets/CustomAssets/EditorToolsAsset/Examples/` for concise patterns you can copy into production.
+
+---
+
+## Detailed Reference
 
 ### 1. ReadOnly Attribute
 A Unity editor tool that provides a `[ReadOnly]` attribute for making fields read-only in the Unity Inspector.

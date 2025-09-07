@@ -10,6 +10,9 @@ A Unity editor tool that provides a `[ReadOnly]` attribute for making fields rea
 ### 2. Serializable Dictionary
 A comprehensive serializable dictionary system with Inspector integration for editing key-value pairs directly in Unity.
 
+### 3. TabGroup Attribute
+Group fields into toolbar-style tabs similar to Odin Inspector's TabGroup, with clean buttons (no foldout arrows).
+
 ---
 
 ## ReadOnly Attribute
@@ -156,6 +159,41 @@ public class LocalizationManager : MonoBehaviour
 - **Editing Entries**: Click on key or value fields to edit them
 - **Removing Entries**: Click the "×" button next to any entry to remove it
 - **Validation**: Duplicate keys are detected and highlighted with warnings
+
+---
+
+## TabGroup Attribute
+
+### Features
+
+- **Toolbar Tabs**: Renders clean toolbar buttons, not foldouts
+- **Grouped Fields**: Fields with the same group name share one tab bar
+- **Multiple Tabs**: Show only fields that belong to the selected tab
+- **Order Control**: Optional `order` decides which field draws the shared toolbar
+
+### Usage
+
+```csharp
+using CustomAssets.EditorTools;
+
+public class TabbedSettings : MonoBehaviour
+{
+    [Header("Stats")]
+    [TabGroup("Stats", "Base")] public int health = 100;
+    [TabGroup("Stats", "Base")] public int stamina = 50;
+    [TabGroup("Stats", "Advanced")] public AnimationCurve regenCurve = AnimationCurve.Linear(0,0,1,1);
+
+    [Header("Inventory")]
+    [TabGroup("Inventory", "Weapons")] public string primaryWeapon;
+    [TabGroup("Inventory", "Armor")] public string chestArmor;
+}
+```
+
+### Notes
+
+- Tabs are tracked per-object instance and group name
+- Tabs within a group are ordered alphabetically for now
+- Use the `order` parameter to influence which field draws the toolbar if needed
 
 ---
 

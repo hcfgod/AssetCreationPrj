@@ -49,19 +49,19 @@ See `Assets/CustomAssets/EditorToolsAsset/Examples/` for concise patterns you ca
 
 ## Detailed Reference
 
-### 1. ReadOnly Attribute
+### ReadOnly Attribute
 A Unity editor tool that provides a `[ReadOnly]` attribute for making fields read-only in the Unity Inspector.
 
-### 2. Serializable Dictionary
+### Serializable Dictionary
 A comprehensive serializable dictionary system with Inspector integration for editing key-value pairs directly in Unity.
 
-### 3. TabGroup Attribute
+### TabGroup Attribute
 Group fields into toolbar-style tabs similar to Odin Inspector's TabGroup, with clean buttons (no foldout arrows).
 
-### 4. FoldoutGroup Attribute
+### FoldoutGroup Attribute
 Group multiple fields under a single foldout header, similar to Odin Inspector's FoldoutGroup. Fields that share the same group name share one foldout state per-object instance. You can control default expansion and which field draws the header via an optional order.
 
-### 5. SceneReference Attribute
+### SceneReference Attribute
 Show a scene dropdown instead of a string or SceneAsset field. Options let you save string fields as scene name (default) or path, and restrict to Build Settings scenes or list all project scenes.
 
 - Supports: string, SceneAsset
@@ -88,31 +88,34 @@ public UnityEditor.SceneAsset mainMenuSceneAsset;
 #endif
 ```
 
-### 4. Button Attribute
+### Button Attribute
 Create custom buttons in the Inspector that execute methods directly, with extensive customization options.
 
-### 5. ShowIf/HideIf Attributes
+### ShowIf/HideIf Attributes
 Conditionally show or hide fields in the Inspector based on other field values, with support for various data types and conditions.
 
-### 6. Title Attribute
+### Title Attribute
 Create colored titles and headers in the Inspector with custom styling, font sizes, and optional separators.
 
-### 7. Min Max Slider Attribute
+### Min Max Slider Attribute
 A custom attribute that allows you to display and edit a float or int value as a min-max slider in the Unity Inspector. This attribute lets you define a range (minimum and maximum limits) and exposes two fields (min and max) as a draggable slider, making it easy to select value ranges for things like spawn areas, stat ranges, or configurable thresholds. The MinMaxSlider attribute supports both float and int types, and provides a clear, user-friendly interface for range selection directly in the Inspector.
 
-### 8. Reorderable List
+### Reorderable List
 Draw arrays and List<T> fields as draggable, add/remove-enabled lists with optional element labels. Supports any Unity-serializable element type and respects nested/complex elements.
 
-### 9. ValidateInput Attribute
+### ValidateInput Attribute
 Validate field values using a method on the component (or static method). The validator can return bool (valid/invalid) or a string (error message when invalid). Shows an info/warning/error box in the Inspector when invalid.
 
-### 10. Convenience Validation Attributes
+### Convenience Validation Attributes
 Drop-in validators for common cases (implemented via a shared drawer):
 - MinValue, MaxValue, RangeValue for numeric bounds
 - RegexMatch for string patterns
 - NotNull for object references (and strings treated as not-null-or-empty)
 - NotEmpty for strings and collections (arrays/lists)
 - NonZero for numeric fields
+
+### InfoBox Attribute
+Display contextual messages above fields (Info/Warning/Error), optionally controlled by a boolean condition. Supports fixed height for multiline content.
 
 ---
 

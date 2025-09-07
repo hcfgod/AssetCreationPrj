@@ -1,0 +1,130 @@
+---
+description: Rules for creating custom Unity assets and editor tools
+globs:
+alwaysApply: true
+---
+
+# Asset Creation Project Rules
+
+This project is dedicated to creating reusable custom assets for Unity games and editor tools. All assets should be designed for maximum reusability, maintainability, and professional quality.
+
+## Project Structure & Organization
+
+### Asset Categories
+- **Editor Tools**: Custom editor windows, inspectors, and utilities
+- **Game Systems**: Inventory, dialogue, save/load, input management
+- **UI Components**: Reusable UI elements and systems
+- **Utilities**: Helper scripts, extensions, and common functionality
+- **ScriptableObjects**: Data containers and configuration assets
+
+## Naming Conventions
+
+### Scripts
+- **Editor Tools**: `{ToolName}Editor` (e.g., `InventoryEditor`, `DialogueEditor`)
+- **Game Systems**: `{SystemName}Manager` or `{SystemName}System` (e.g., `InventoryManager`, `DialogueSystem`)
+- **UI Components**: `{ComponentName}UI` (e.g., `InventorySlotUI`, `DialogueBoxUI`)
+- **Utilities**: `{UtilityName}Utility` or `{UtilityName}Helper` (e.g., `MathUtility`, `StringHelper`)
+- **ScriptableObjects**: `{DataName}Data` or `{ConfigName}Config` (e.g., `ItemData`, `GameConfig`)
+
+### Assets
+- **Prefabs**: `P_{Category}_{Name}` (e.g., `P_UI_InventorySlot`, `P_Game_Player`)
+- **ScriptableObjects**: `SO_{Category}_{Name}` (e.g., `SO_Items_Sword`, `SO_Config_GameSettings`)
+- **Materials**: `M_{Category}_{Name}` (e.g., `M_UI_Button`, `M_Game_Player`)
+
+## Code Standards
+
+### Editor Tools
+- All editor scripts must be in `Editor` folders
+- Use `[MenuItem]` attributes for menu items
+- Implement proper error handling and validation
+- Provide clear user feedback and progress indicators
+- Use `EditorGUILayout` for consistent styling
+
+### Game Systems
+- Design for maximum reusability across projects
+- Use ScriptableObjects for configuration data
+- Implement proper event systems for decoupling
+- Include comprehensive error handling
+- Provide clear documentation and examples
+
+### Performance Considerations
+- Avoid allocations in Update/FixedUpdate loops
+- Use object pooling for frequently created/destroyed objects
+- Cache references instead of using FindObjectOfType
+- Implement proper cleanup and disposal patterns
+
+## Documentation Requirements
+
+### Code Documentation
+- All public methods must have XML documentation
+- Include usage examples in complex systems
+- Document any special requirements or dependencies
+- Provide clear parameter descriptions
+
+### Asset Documentation
+- Create README files for complex systems
+- Include setup instructions and usage examples
+- Document any external dependencies
+- Provide troubleshooting guides
+
+## Testing & Validation
+
+### Editor Tools
+- Test with various asset types and configurations
+- Validate input parameters and handle edge cases
+- Ensure tools work with different Unity versions
+- Test performance with large datasets
+
+### Game Systems
+- Create example scenes demonstrating functionality
+- Test with different configurations and edge cases
+- Ensure systems work in both editor and build
+- Validate save/load functionality where applicable
+
+## Version Control & Distribution
+
+### Asset Packaging
+- Keep assets modular and self-contained
+- Minimize external dependencies
+- Use Unity Package Manager format when possible
+- Include proper meta files and dependencies
+
+### Version Management
+- Use semantic versioning for releases
+- Maintain changelog for each version
+- Tag releases appropriately
+- Document breaking changes clearly
+
+## Quality Standards
+
+### Code Quality
+- Follow Unity coding conventions
+- Use meaningful variable and method names
+- Implement proper error handling
+- Write clean, readable, and maintainable code
+
+### Asset Quality
+- Ensure assets work across different Unity versions
+- Test on multiple platforms when applicable
+- Provide clear documentation and examples
+- Maintain backward compatibility when possible
+
+## Best Practices
+
+### Reusability
+- Design systems to be configuration-driven
+- Use ScriptableObjects for data that might change
+- Implement proper interfaces and abstractions
+- Avoid hard-coded values and magic numbers
+
+### Maintainability
+- Keep systems focused and single-purpose
+- Use composition over inheritance
+- Implement proper separation of concerns
+- Write self-documenting code
+
+### User Experience
+- Provide clear error messages and validation
+- Include helpful tooltips and documentation
+- Design intuitive interfaces and workflows
+- Consider both novice and expert users

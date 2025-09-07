@@ -1,11 +1,19 @@
 using System;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 
 namespace CustomAssets.EditorTools.Editor
 {
     [CustomPropertyDrawer(typeof(ValidateInputAttribute))]
+    [CustomPropertyDrawer(typeof(MinValueAttribute))]
+    [CustomPropertyDrawer(typeof(MaxValueAttribute))]
+    [CustomPropertyDrawer(typeof(RangeValueAttribute))]
+    [CustomPropertyDrawer(typeof(RegexMatchAttribute))]
+    [CustomPropertyDrawer(typeof(NotNullAttribute))]
+    [CustomPropertyDrawer(typeof(NotEmptyAttribute))]
+    [CustomPropertyDrawer(typeof(NonZeroAttribute))]
     public class ValidateInputPropertyDrawer : PropertyDrawer
     {
         private struct ValidationResult
@@ -47,16 +55,24 @@ namespace CustomAssets.EditorTools.Editor
 
         private ValidationResult Evaluate(SerializedProperty property)
         {
-            var attr = (ValidateInputAttribute)attribute;
-            var targets = property.serializedObject.targetObjects;
-
-            // If any target is invalid, we display the message
-            foreach (var target in targets)
+            // Route to specific validators
+            if (attribute is ValidateInputAttribute vi)
             {
-                var res = EvaluateForTarget(target, property, attr);
-                if (!res.isValid)
-                    return res;
+                var targets = property.serializedObject.targetObjects;
+                foreach (var target in targets)
+                {
+                    var res = EvaluateForTarget(target, property, vi);
+                    if (!res.isValid) return res;
+                }
+                return new ValidationResult { isValid = true };
             }
+            if (attribute is MinValueAttribute minAttr) return EvaluateMin(property, minAttr);
+            if (attribute is MaxValueAttribute maxAttr) return EvaluateMax(property, maxAttr);
+            if (attribute is RangeValueAttribute rangeAttr) return EvaluateRange(property, rangeAttr);
+            if (attribute is RegexMatchAttribute regexAttr) return EvaluateRegex(property, regexAttr);
+            if (attribute is NotNullAttribute notNullAttr) return EvaluateNotNull(property, notNullAttr);
+            if (attribute is NotEmptyAttribute notEmptyAttr) return EvaluateNotEmpty(property, notEmptyAttr);
+            if (attribute is NonZeroAttribute nonZeroAttr) return EvaluateNonZero(property, nonZeroAttr);
 
             return new ValidationResult
             {
@@ -140,6 +156,133 @@ namespace CustomAssets.EditorTools.Editor
                 case ValidateSeverity.Warning: return MessageType.Warning;
                 default: return MessageType.Error;
             }
+        }
+
+        private ValidationResult EvaluateMin(SerializedProperty property, MinValueAttribute attr)
+        {
+            string msg = string.IsNullOrEmpty(attr.Message) ? $"Value must be ≥ {attr.Min}" : attr.Message;
+            switch (property.propertyType)
+            {
+                case SerializedPropertyType.Integer:
+                    return new ValidationResult
+                    {
+                        isValid = property.intValue >= attr.Min,
+                        message = property.intValue >= attr.Min ? null : msg,
+                        messageType = ToMessageType(attr.Severity)
+                    };
+                case SerializedPropertyType.Float:
+                    return new ValidationResult
+                    {
+                        isValid = property.floatValue >= attr.Min,
+                        message = property.floatValue >= attr.Min ? null : msg,
+                        messageType = ToMessageType(attr.Severity)
+                    };
+                default:
+                    return new ValidationResult { isValid = true };
+            }
+        }
+
+        private ValidationResult EvaluateMax(SerializedProperty property, MaxValueAttribute attr)
+        {
+            string msg = string.IsNullOrEmpty(attr.Message) ? $"Value must be ≤ {attr.Max}" : attr.Message;
+            switch (property.propertyType)
+            {
+                case SerializedPropertyType.Integer:
+                    return new ValidationResult
+                    {
+                        isValid = property.intValue <= attr.Max,
+                        message = property.intValue <= attr.Max ? null : msg,
+                        messageType = ToMessageType(attr.Severity)
+                    };
+                case SerializedPropertyType.Float:
+                    return new ValidationResult
+                    {
+                        isValid = property.floatValue <= attr.Max,
+                        message = property.floatValue <= attr.Max ? null : msg,
+                        messageType = ToMessageType(attr.Severity)
+                    };
+                default:
+                    return new ValidationResult { isValid = true };
+            }
+        }
+
+        private ValidationResult EvaluateRange(SerializedProperty property, RangeValueAttribute attr)
+        {
+            string msg = string.IsNullOrEmpty(attr.Message) ? $"Value must be in [{attr.Min}, {attr.Max}]" : attr.Message;
+            switch (property.propertyType)
+            {
+                case SerializedPropertyType.Integer:
+                    bool okI = property.intValue >= attr.Min && property.intValue <= attr.Max;
+                    return new ValidationResult { isValid = okI, message = okI ? null : msg, messageType = ToMessageType(attr.Severity) };
+                case SerializedPropertyType.Float:
+                    bool okF = property.floatValue >= attr.Min && property.floatValue <= attr.Max;
+                    return new ValidationResult { isValid = okF, message = okF ? null : msg, messageType = ToMessageType(attr.Severity) };
+                default:
+                    return new ValidationResult { isValid = true };
+            }
+        }
+
+        private ValidationResult EvaluateRegex(SerializedProperty property, RegexMatchAttribute attr)
+        {
+            if (property.propertyType != SerializedPropertyType.String) return new ValidationResult { isValid = true };
+            string value = property.stringValue ?? string.Empty;
+            if (string.IsNullOrEmpty(value))
+            {
+                return new ValidationResult { isValid = attr.AllowEmpty, message = attr.AllowEmpty ? null : (attr.Message ?? "Value cannot be empty"), messageType = ToMessageType(attr.Severity) };
+            }
+            bool match = false;
+            try { match = Regex.IsMatch(value, attr.Pattern); } catch { match = false; }
+            return new ValidationResult
+            {
+                isValid = match,
+                message = match ? null : (attr.Message ?? "Value does not match the required pattern"),
+                messageType = ToMessageType(attr.Severity)
+            };
+        }
+
+        private ValidationResult EvaluateNotNull(SerializedProperty property, NotNullAttribute attr)
+        {
+            switch (property.propertyType)
+            {
+                case SerializedPropertyType.ObjectReference:
+                    bool okObj = property.objectReferenceValue != null;
+                    return new ValidationResult { isValid = okObj, message = okObj ? null : (attr.Message ?? "Reference cannot be null"), messageType = ToMessageType(attr.Severity) };
+                case SerializedPropertyType.String:
+                    bool okStr = !string.IsNullOrEmpty(property.stringValue);
+                    return new ValidationResult { isValid = okStr, message = okStr ? null : (attr.Message ?? "String cannot be null or empty"), messageType = ToMessageType(attr.Severity) };
+                default:
+                    return new ValidationResult { isValid = true };
+            }
+        }
+
+        private ValidationResult EvaluateNotEmpty(SerializedProperty property, NotEmptyAttribute attr)
+        {
+            if (property.propertyType == SerializedPropertyType.String)
+            {
+                bool ok = !string.IsNullOrEmpty(property.stringValue);
+                return new ValidationResult { isValid = ok, message = ok ? null : (attr.Message ?? "String cannot be empty"), messageType = ToMessageType(attr.Severity) };
+            }
+            if (property.isArray && property.propertyType != SerializedPropertyType.String)
+            {
+                bool ok = property.arraySize > 0;
+                return new ValidationResult { isValid = ok, message = ok ? null : (attr.Message ?? "Collection cannot be empty"), messageType = ToMessageType(attr.Severity) };
+            }
+            return new ValidationResult { isValid = true };
+        }
+
+        private ValidationResult EvaluateNonZero(SerializedProperty property, NonZeroAttribute attr)
+        {
+            if (property.propertyType == SerializedPropertyType.Integer)
+            {
+                bool ok = property.intValue != 0;
+                return new ValidationResult { isValid = ok, message = ok ? null : (attr.Message ?? "Value cannot be zero"), messageType = ToMessageType(attr.Severity) };
+            }
+            if (property.propertyType == SerializedPropertyType.Float)
+            {
+                bool ok = Mathf.Abs(property.floatValue) > Mathf.Epsilon;
+                return new ValidationResult { isValid = ok, message = ok ? null : (attr.Message ?? "Value cannot be zero"), messageType = ToMessageType(attr.Severity) };
+            }
+            return new ValidationResult { isValid = true };
         }
 
         private MethodInfo FindValidatorMethod(Type type, string methodName, Type paramType)

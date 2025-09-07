@@ -1104,6 +1104,7 @@ GameObject:
   - component: {fileID: 1319207159}
   - component: {fileID: 1319207162}
   - component: {fileID: 1319207161}
+  - component: {fileID: 1319207163}
   m_Layer: 0
   m_Name: TestGameobject
   m_TagString: Untagged
@@ -1310,7 +1311,11 @@ MonoBehaviour:
   speed: 5
   displayName: Player
   tags:
-  - a
+  - 
+  - 
+  - 
+  - 
+  - 
 --- !u!114 &1319207162
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1331,6 +1336,26 @@ MonoBehaviour:
   - Item B
   normalField: This shows Title correctly
   unityHeaderField: Unity header also works
+--- !u!114 &1319207163
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1319207153}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d35b4bf447cf6954e8c21127c1fb8c3f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomAssets.EditorTools.Examples.ValidateConvenienceExample
+  speed: 5
+  health: 50
+  damage: 5
+  displayName: Player
+  userName: Player_01
+  prefab: {fileID: 0}
+  tags:
+  - A
 --- !u!1 &1776224341
 GameObject:
   m_ObjectHideFlags: 0

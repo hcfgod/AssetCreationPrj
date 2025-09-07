@@ -22,6 +22,9 @@ Conditionally show or hide fields in the Inspector based on other field values, 
 ### 6. Title Attribute
 Create colored titles and headers in the Inspector with custom styling, font sizes, and optional separators.
 
+### 7. Min Max Slider Attribute
+A custom attribute that allows you to display and edit a float or int value as a min-max slider in the Unity Inspector. This attribute lets you define a range (minimum and maximum limits) and exposes two fields (min and max) as a draggable slider, making it easy to select value ranges for things like spawn areas, stat ranges, or configurable thresholds. The MinMaxSlider attribute supports both float and int types, and provides a clear, user-friendly interface for range selection directly in the Inspector.
+
 ---
 
 ## ReadOnly Attribute
@@ -225,6 +228,35 @@ public class TabbedSettings : MonoBehaviour
 - Tabs are tracked per-object instance and group name
 - Tabs within a group are ordered alphabetically for now
 - Use the `order` parameter to influence which field draws the toolbar if needed
+
+## MinMaxSlider Attribute
+
+### Features
+
+- **Range Selection**: Allows you to select a minimum and maximum value using a single slider in the Inspector.
+- **Customizable Range**: Specify the allowed minimum and maximum values for the slider.
+- **Supports Vector2/Vector2Int**: Works with `Vector2`, `Vector2Int`, and fields with two float/int values representing min and max.
+- **Validation**: Ensures that the minimum value does not exceed the maximum.
+
+### Usage
+```csharp
+using CustomAssets.EditorTools;
+
+public class MinMaxSliderExample : MonoBehaviour
+    {
+        [Header("Float Range [0..1]")]
+        [MinMaxSlider(0f, 1f)]
+        public Vector2 spawnTimeRange = new Vector2(0.2f, 0.8f);
+
+        [Header("Int Range [0..100]")]
+        [MinMaxSlider(0, 100)]
+        public Vector2Int levelRange = new Vector2Int(10, 40);
+
+        [Header("Float Range [10..50] with precise fields hidden")]
+        [MinMaxSlider(10f, 50f, showFields: false)]
+        public Vector2 speedLimits = new Vector2(12f, 30f);
+    }
+```
 
 ---
 

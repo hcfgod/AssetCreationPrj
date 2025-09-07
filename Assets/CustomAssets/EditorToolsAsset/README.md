@@ -328,6 +328,7 @@ Assets/
 │       ├── ButtonAttribute.cs                      # Button attribute class
 │       ├── FoldoutGroupAttribute.cs                # Foldout group attribute class
 │       ├── SceneReferenceAttribute.cs              # Scene reference attribute class
+│       ├── InfoBoxAttribute.cs                     # Info box attribute
 │       ├── MinMaxSliderAttribute.cs                # Min–Max slider attribute class
 │       ├── ReorderableListAttribute.cs             # Reorderable list attribute class
 │       ├── ValidateInputAttribute.cs               # ValidateInput attribute class
@@ -346,6 +347,7 @@ Assets/
 │       │   ├── TabGroupPropertyDrawer.cs           # TabGroup property drawer
 │       │   ├── FoldoutGroupPropertyDrawer.cs       # Foldout group property drawer
 │       │   ├── SceneReferencePropertyDrawer.cs     # Scene reference property drawer
+│       │   ├── InfoBoxPropertyDrawer.cs            # Info box property drawer
 │       │   ├── FoldoutGroupPropertyDrawer.cs       # Foldout group property drawer
 │       │   ├── MinMaxSliderPropertyDrawer.cs       # Min–Max slider property drawer
 │       │   ├── ReorderableListPropertyDrawer.cs    # Reorderable list property drawer
@@ -358,6 +360,7 @@ Assets/
 │       │   ├── TabGroupExample.cs                  # TabGroup usage examples
 │       │   ├── FoldoutGroupExample.cs              # Foldout group usage examples
 │       │   ├── SceneReferenceExample.cs            # Scene reference usage examples
+│       │   └── InfoBoxExample.cs                   # Info box usage examples
 │       │   ├── MinMaxSliderExample.cs              # MinMaxSlider usage examples
 │       │   ├── ReorderableListExample.cs           # Reorderable list usage examples
 │       │   ├── ValidateInputExample.cs             # ValidateInput usage examples
@@ -1146,6 +1149,60 @@ public class PlayerSettings : MonoBehaviour
         return string.IsNullOrWhiteSpace(s) ? "Name must not be empty" : null;
     }
 }
+```
+
+### 11. InfoBox Attribute
+
+Display inline help boxes above fields. Supports conditional visibility via a boolean field/property/method.
+
+- Types: Info, Warning, Error
+- Conditional visibility: pass the name of a bool member or method
+- Height control: optional fixed height parameter for multi-line content
+
+Examples
+
+```csharp
+[InfoBox("This is an info message.")]
+public int someValue;
+
+[InfoBox("This info box is set to a fixed height of 60 pixels.", InfoBoxType.Info, 60f)]
+public int fixedHeightExample;
+
+[InfoBox("Warning: This value is experimental.", InfoBoxType.Warning)]
+public float experimentalValue;
+
+public bool showError;
+[InfoBox("Error shown when 'showError' is true.", nameof(showError), InfoBoxType.Error)]
+public string guardedField;
+
+[InfoBox("Shown when IsAdvancedMode() returns true.", nameof(IsAdvancedMode))]
+public int advancedSetting;
+private bool IsAdvancedMode() => true;
+```
+
+### 11. InfoBox Attribute
+
+Display inline help boxes above fields. Supports conditional visibility via a boolean field/property/method.
+
+- Types: Info, Warning, Error
+- Conditional visibility: pass the name of a bool member or method
+
+Examples
+
+```csharp
+[InfoBox("This is an info message.")]
+public int someValue;
+
+[InfoBox("Warning: This value is experimental.", InfoBoxType.Warning)]
+public float experimentalValue;
+
+public bool showError;
+[InfoBox("Error shown when 'showError' is true.", nameof(showError), InfoBoxType.Error)]
+public string guardedField;
+
+[InfoBox("Shown when IsAdvancedMode() returns true.", nameof(IsAdvancedMode))]
+public int advancedSetting;
+private bool IsAdvancedMode() => true;
 ```
 
 ## License

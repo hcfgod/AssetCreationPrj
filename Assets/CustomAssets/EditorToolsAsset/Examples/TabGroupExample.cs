@@ -9,7 +9,7 @@ namespace CustomAssets.EditorTools.Examples
 		[TabGroup("Stats", "Base", order: 0)] public int stamina = 50;
 		[TabGroup("Stats", "Advanced", order: 0)] public AnimationCurve regenCurve = AnimationCurve.Linear(0, 0, 1, 1);
 
-		[Header("Inventory")]
+		[Title("Inventory")]
 		[TabGroup("Inventory", "Weapons", order: 0)] public string primaryWeapon;
 		[TabGroup("Inventory", "Armor", order: 0)] public string chestArmor;
 		[TabGroup("Inventory", "Armor", order: 0)] public string helmet;

@@ -4,16 +4,16 @@ namespace CustomAssets.EditorTools.Examples
 {
     public class SceneReferenceExample : MonoBehaviour
     {
-        [Header("By Name (Build Scenes Only)")]
+        [Title("By Name (Build Scenes Only)")]
         [SceneReference] public string mainMenuScene;
 
-        [Header("By Path (Build Scenes Only)")]
+        [Title("By Path (Build Scenes Only)")]
         [SceneReference(saveAsPath: true)] public string gameplayScenePath;
 
-        [Header("By Name (All Project Scenes)")]
+        [Title("By Name (All Project Scenes)")]
         [SceneReference(saveAsPath: false, onlyBuildScenes: false)] public string anySceneName;
 
-        [Header("SceneAsset (Object Reference)")]
+        [Title("SceneAsset (Object Reference)")]
         #if UNITY_EDITOR
         public UnityEditor.SceneAsset mainMenuSceneAsset;
         #endif

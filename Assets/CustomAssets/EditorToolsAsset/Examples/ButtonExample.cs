@@ -9,7 +9,7 @@ namespace CustomAssets.EditorTools.Examples
     /// </summary>
     public class ButtonExample : MonoBehaviour
     {
-        [Header("Button Examples")]
+        [Title("Button Examples")]
         [SerializeField] private int counter = 0;
         [SerializeField] private string message = "Hello World!";
         [SerializeField] private Color randomColor = Color.white;

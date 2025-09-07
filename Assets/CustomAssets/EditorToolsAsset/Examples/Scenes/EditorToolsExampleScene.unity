@@ -1107,6 +1107,7 @@ GameObject:
   - component: {fileID: 1319207163}
   - component: {fileID: 1319207164}
   - component: {fileID: 1319207165}
+  - component: {fileID: 1319207166}
   m_Layer: 0
   m_Name: TestGameobject
   m_TagString: Untagged
@@ -1318,6 +1319,7 @@ MonoBehaviour:
   - 
   - 
   - 
+  - 
 --- !u!114 &1319207162
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1390,9 +1392,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d14957437d22cef4292ed04f7ef2b268, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CustomAssets.EditorTools.Examples.SceneReferenceExample
-  mainMenuScene: 
+  mainMenuScene: SampleScene
   gameplayScenePath: 
   anySceneName: 
+  mainMenuSceneAsset: {fileID: 0}
+--- !u!114 &1319207166
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1319207153}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e79c0664df4a89d44babeb140c7ec1d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CustomAssets.EditorTools.Examples.InfoBoxExample
+  someValue: 0
+  experimentalValue: 0.81
+  showError: 0
+  guardedField: 
+  advancedSetting: 5
 --- !u!1 &1776224341
 GameObject:
   m_ObjectHideFlags: 0

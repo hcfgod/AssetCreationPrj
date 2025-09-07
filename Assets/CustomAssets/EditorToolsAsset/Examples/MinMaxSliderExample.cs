@@ -8,7 +8,7 @@ namespace CustomAssets.EditorTools.Examples
         [MinMaxSlider(0f, 1f)]
         public Vector2 spawnTimeRange = new Vector2(0.2f, 0.8f);
 
-        [Header("Int Range [0..100]")]
+        [Title("Int Range [0..100]")]
         [MinMaxSlider(0, 100)]
         public Vector2Int levelRange = new Vector2Int(10, 40);
 

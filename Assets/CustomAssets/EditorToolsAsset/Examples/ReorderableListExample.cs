@@ -17,7 +17,7 @@ namespace CustomAssets.EditorTools.Examples
         [ReorderableList]
         public int[] levels = new[] { 1, 2, 3 };
 
-        [Header("List of strings")]
+        [Title("List of strings")]
         [ReorderableList("Inventory Items")]
         public List<string> items = new List<string> { "Sword", "Potion" };
 

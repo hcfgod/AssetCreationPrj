@@ -5,6 +5,8 @@ using UnityEditor;
 using UnityEditor.ShortcutManagement;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEditor.UIElements;
+using System.Linq;
 
 namespace CustomAssets.EditorTools.Editor
 {
@@ -118,13 +120,64 @@ namespace CustomAssets.EditorTools.Editor
                 header.style.paddingLeft = 6;
                 header.style.paddingRight = 6;
                 header.style.alignItems = Align.Center;
+                header.style.width = new StyleLength(new Length(100, LengthUnit.Percent));
 
                 var title = new Label("Project");
                 title.style.color = Color.white;
-                header.Add(title);
+                title.style.unityFontStyleAndWeight = FontStyle.Bold;
+                title.style.marginLeft = 0;
+                title.style.marginRight = 8;
+                title.style.flexShrink = 0;
+
+                var search = new ToolbarSearchField();
+                search.style.flexGrow = 1;
+                search.style.flexShrink = 1;
+                search.style.minWidth = 0; // allow shrinking within row
+                search.style.marginLeft = 0;
+                search.style.marginRight = 6;
+                search.tooltip = "Search assets";
+
+                var headerRow = new VisualElement();
+                headerRow.style.flexDirection = FlexDirection.Row;
+                headerRow.style.flexGrow = 1;
+                headerRow.style.alignItems = Align.Center;
+                headerRow.style.width = new StyleLength(new Length(100, LengthUnit.Percent));
+
+                var closeBtn = new Button(() =>
+                {
+                    if (_tempProjectPopup != null)
+                    {
+                        try { _tempProjectPopup.Close(); } catch { }
+                        _tempProjectPopup = null;
+                    }
+                }) { text = "\u00D7" }; // multiplication sign as close symbol
+                closeBtn.style.width = 22;
+                closeBtn.style.height = 18;
+                closeBtn.style.marginLeft = 6;
+                closeBtn.style.flexShrink = 0;
+                closeBtn.tooltip = "Close";
+
+                headerRow.Add(title);
+                headerRow.Add(search);
+                headerRow.Add(closeBtn);
+                header.Add(headerRow);
 
                 // Insert at top so it pushes content down
                 root.Insert(0, header);
+
+                // Hook search change -> select matching assets in Project
+                search.RegisterValueChangedCallback(evt =>
+                {
+                    ApplyProjectSearch(evt.newValue);
+                });
+                search.RegisterCallback<KeyDownEvent>(evt =>
+                {
+                    if (evt.keyCode == KeyCode.Escape)
+                    {
+                        if (_tempProjectPopup != null) { _tempProjectPopup.Close(); _tempProjectPopup = null; }
+                        evt.StopImmediatePropagation();
+                    }
+                });
 
                 header.RegisterCallback<MouseDownEvent>(evt =>
                 {
@@ -180,6 +233,34 @@ namespace CustomAssets.EditorTools.Editor
                 _dragWindow.position = r;
                 _dragWindow.Repaint();
             }
+        }
+
+        private static void ApplyProjectSearch(string query)
+        {
+            if (query == null) query = string.Empty;
+            query = query.Trim();
+            if (string.IsNullOrEmpty(query))
+            {
+                // Clear selection on empty search
+                Selection.objects = Array.Empty<UnityEngine.Object>();
+                return;
+            }
+            try
+            {
+                var guids = AssetDatabase.FindAssets(query, new[] { "Assets" });
+                var objs = guids.Take(200)
+                                .Select(g => AssetDatabase.GUIDToAssetPath(g))
+                                .Where(p => !string.IsNullOrEmpty(p))
+                                .Select(p => AssetDatabase.LoadMainAssetAtPath(p))
+                                .Where(o => o != null)
+                                .ToArray();
+                Selection.objects = objs;
+                if (objs.Length > 0)
+                {
+                    EditorGUIUtility.PingObject(objs[0]);
+                }
+            }
+            catch { }
         }
 
 #if UNITY_EDITOR_WIN

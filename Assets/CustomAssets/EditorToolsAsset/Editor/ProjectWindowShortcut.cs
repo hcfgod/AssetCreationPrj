@@ -127,7 +127,7 @@ namespace CustomAssets.EditorTools.Editor
 
                 var header = new VisualElement { name = "ProjectPopupHeader" };
                 header.style.height = 22;
-header.style.flexShrink = 0;
+                header.style.flexShrink = 0;
                 header.style.backgroundColor = new Color(0.15f, 0.15f, 0.15f);
                 header.style.borderBottomWidth = 1;
                 header.style.borderBottomColor = new Color(0f, 0f, 0f, 0.35f);
@@ -153,7 +153,7 @@ header.style.flexShrink = 0;
                 search.style.minWidth = 0; // allow shrinking within row
                 search.style.marginLeft = 0;
                 search.style.marginRight = 6;
-search.tooltip = "Search assets";
+                search.tooltip = "Search assets";
 
                 var headerRow = new VisualElement();
                 headerRow.style.flexDirection = FlexDirection.Row;

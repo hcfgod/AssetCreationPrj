@@ -200,69 +200,16 @@ namespace CustomAssets.EditorTools
         // Hooks
         private bool _selectionHookActive;
 
-        // Theming
-        protected class Theme
-        {
-            public Color BackgroundColor = new Color(0.13f, 0.13f, 0.13f);
-            public Color AccentColor = new Color(0.2f, 0.6f, 1f);
-            public Color SeparatorColor = new Color(0.3f, 0.3f, 0.3f);
-            public Color FooterBorderColor = new Color(0f, 0f, 0f, 0.15f);
-            public Color ToggleActiveColor = new Color(0.7f, 1f, 0.7f);
-        }
+        // Theming (moved out to EditorTheme + EditorThemeManager)
+        protected EditorTheme CurrentTheme => EditorThemeManager.GetThemeForWindow(GetType());
 
-        private Theme _theme;
-        protected Theme CurrentTheme => _theme ??= LoadTheme();
-        
-        protected virtual Theme LoadTheme()
-        {
-            Theme t = new Theme();
-            try
-            {
-                string prefix = GetPrefsKey("theme.");
-                t.BackgroundColor = LoadColor(prefix + "bg", t.BackgroundColor);
-                t.AccentColor = LoadColor(prefix + "accent", t.AccentColor);
-                t.SeparatorColor = LoadColor(prefix + "sep", t.SeparatorColor);
-                t.FooterBorderColor = LoadColor(prefix + "footer", t.FooterBorderColor);
-                t.ToggleActiveColor = LoadColor(prefix + "toggle", t.ToggleActiveColor);
-            }
-            catch { }
-            return t;
-        }
-
+        /// <summary>
+        /// Persists this window's current theme as an override.
+        /// </summary>
         protected void SaveTheme()
         {
-            if (_theme == null) return;
-            try
-            {
-                string prefix = GetPrefsKey("theme.");
-                SaveColor(prefix + "bg", _theme.BackgroundColor);
-                SaveColor(prefix + "accent", _theme.AccentColor);
-                SaveColor(prefix + "sep", _theme.SeparatorColor);
-                SaveColor(prefix + "footer", _theme.FooterBorderColor);
-                SaveColor(prefix + "toggle", _theme.ToggleActiveColor);
-            }
-            catch { }
-        }
-
-        private static Color LoadColor(string key, Color fallback)
-        {
-            Color c = fallback;
-            if (EditorPrefs.HasKey(key + ".r"))
-            {
-                c.r = EditorPrefs.GetFloat(key + ".r", c.r);
-                c.g = EditorPrefs.GetFloat(key + ".g", c.g);
-                c.b = EditorPrefs.GetFloat(key + ".b", c.b);
-                c.a = EditorPrefs.GetFloat(key + ".a", c.a);
-            }
-            return c;
-        }
-
-        private static void SaveColor(string key, Color c)
-        {
-            EditorPrefs.SetFloat(key + ".r", c.r);
-            EditorPrefs.SetFloat(key + ".g", c.g);
-            EditorPrefs.SetFloat(key + ".b", c.b);
-            EditorPrefs.SetFloat(key + ".a", c.a);
+            var theme = EditorThemeManager.GetEditableThemeForWindow(GetType());
+            EditorThemeManager.SaveThemeForWindow(GetType(), theme);
         }
 
         public static T Instance
@@ -347,6 +294,9 @@ namespace CustomAssets.EditorTools
             {
                 EnableRepaintOnSelectionChange();
             }
+
+            // Listen for theme changes to repaint
+            try { EditorThemeManager.ThemeChanged -= Repaint; EditorThemeManager.ThemeChanged += Repaint; } catch { }
         }
 
         protected virtual void OnDisable()
@@ -362,6 +312,9 @@ namespace CustomAssets.EditorTools
 
             DisableAutoRepaint();
             DisableRepaintOnSelectionChange();
+
+            // Stop listening for theme changes
+            try { EditorThemeManager.ThemeChanged -= Repaint; } catch { }
 
             if (ReferenceEquals(_instance, this)) _instance = null;
         }

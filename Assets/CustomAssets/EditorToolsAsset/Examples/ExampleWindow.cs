@@ -75,7 +75,7 @@ public class ExampleWindow : KEditorWindow<ExampleWindow>
         {
             Horizontal(() =>
             {
-                if (GUILayout.Button("Normal Button"))
+                if (Button("Normal Button"))
                 {
                     Debug.Log("Normal button clicked!");
                 }
@@ -166,8 +166,8 @@ public class ExampleWindow : KEditorWindow<ExampleWindow>
                 EditorGUILayout.LabelField("Horizontal group:");
 
                 GUILayout.FlexibleSpace();
-                GUILayout.Button("Button 1");
-                GUILayout.Button("Button 2");
+                Button("Button 1");
+                Button("Button 2");
             });
         });
         
@@ -195,9 +195,9 @@ public class ExampleWindow : KEditorWindow<ExampleWindow>
             
             Horizontal(() =>
             {
-                if (Button("Small", null, null, EditorStyle.Default, LayoutOption.Width60)) { }
-                if (Button("Medium", null, null, EditorStyle.Default, LayoutOption.Width100)) { }
-                if (Button("Large", null, null, EditorStyle.Default, LayoutOption.Width150)) { }
+                if (Button("Small", null, null, EditorStyle.Button, LayoutOption.Width60)) { }
+                if (Button("Medium", null, null, EditorStyle.Button, LayoutOption.Width100)) { }
+                if (Button("Large", null, null, EditorStyle.Button, LayoutOption.Width150)) { }
             });
             
             EditorGUILayout.Space();
@@ -205,8 +205,8 @@ public class ExampleWindow : KEditorWindow<ExampleWindow>
             
             Horizontal(() =>
             {
-                if (Button("Tall", null, null, EditorStyle.Default, LayoutOption.Height30)) { }
-                if (Button("Short", null, null, EditorStyle.Default, LayoutOption.Height18)) { }
+                if (Button("Tall", null, null, EditorStyle.Button, LayoutOption.Height30)) { }
+                if (Button("Short", null, null, EditorStyle.Button, LayoutOption.Height18)) { }
             });
             
             EditorGUILayout.Space();
@@ -214,8 +214,8 @@ public class ExampleWindow : KEditorWindow<ExampleWindow>
             
             Horizontal(() =>
             {
-                if (Button("Min 100px", null, null, EditorStyle.Default, LayoutOption.MinWidth100)) { }
-                if (Button("Max 200px", null, null, EditorStyle.Default, LayoutOption.MaxWidth200)) { }
+                if (Button("Min 100px", null, null, EditorStyle.Button, LayoutOption.MinWidth100)) { }
+                if (Button("Max 200px", null, null, EditorStyle.Button, LayoutOption.MaxWidth200)) { }
             });
         });
         
@@ -225,7 +225,6 @@ public class ExampleWindow : KEditorWindow<ExampleWindow>
             
             Horizontal(() =>
             {
-                if (Button("Default", null, null, EditorStyle.Default, LayoutOption.Width80)) { }
                 if (Button("Button", null, null, EditorStyle.Button, LayoutOption.Width80)) { }
                 if (Button("Mini", null, null, EditorStyle.MiniButton, LayoutOption.Width80)) { }
             });
@@ -244,7 +243,6 @@ public class ExampleWindow : KEditorWindow<ExampleWindow>
             
             Horizontal(() =>
             {
-                demoToggle = ToggleButton("Default Toggle", demoToggle, EditorStyle.Default, LayoutOption.Width100);
                 demoToggle = ToggleButton("Button Toggle", demoToggle, EditorStyle.Button, LayoutOption.Width100);
             });
         });
@@ -345,55 +343,59 @@ public class ExampleWindow : KEditorWindow<ExampleWindow>
             EditorGUILayout.LabelField("Adjust colors used by KEditorWindow helpers.");
         });
 
-        Foldout("theme_colors", "Colors", () =>
+        var theme = EditorThemeManager.GetEditableThemeForWindow(typeof(ExampleWindow));
+
+        Foldout("theme_colors", "Per-Window Colors", () =>
         {
-            var theme = (typeof(KEditorWindow<ExampleWindow>)
-                .GetField("_theme", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
-                ?.GetValue(this));
+            theme.BackgroundColor   = ColorPicker("Background", theme.BackgroundColor);
+            theme.AccentColor       = ColorPicker("Accent", theme.AccentColor);
+            theme.SeparatorColor    = ColorPicker("Separator", theme.SeparatorColor);
+            theme.FooterBorderColor = ColorPicker("Footer Border", theme.FooterBorderColor);
+            theme.ToggleActiveColor = ColorPicker("Toggle Active", theme.ToggleActiveColor);
 
-            // Access via protected CurrentTheme property through reflection as well
-            var themeProp = typeof(KEditorWindow<ExampleWindow>)
-                .GetProperty("CurrentTheme", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
-            var currentTheme = themeProp?.GetValue(this);
-            if (currentTheme == null) return;
-
-            // Helper to get/set fields via reflection
-            System.Func<string, Color> get = (name) =>
+            EditorGUILayout.Space();
+            Horizontal(() =>
             {
-                var fi = currentTheme.GetType().GetField(name);
-                return (Color)fi.GetValue(currentTheme);
-            };
-            System.Action<string, Color> set = (name, val) =>
+                if (Button("Apply Light Defaults", null, null, EditorStyle.MiniButton, LayoutOption.Width150))
+                {
+                    var def = EditorTheme.DefaultLight();
+                    theme.BackgroundColor   = def.BackgroundColor;
+                    theme.AccentColor       = def.AccentColor;
+                    theme.SeparatorColor    = def.SeparatorColor;
+                    theme.FooterBorderColor = def.FooterBorderColor;
+                    theme.ToggleActiveColor = def.ToggleActiveColor;
+                }
+                if (Button("Apply Dark Defaults", null, null, EditorStyle.MiniButton, LayoutOption.Width150))
+                {
+                    var def = EditorTheme.DefaultDark();
+                    theme.BackgroundColor   = def.BackgroundColor;
+                    theme.AccentColor       = def.AccentColor;
+                    theme.SeparatorColor    = def.SeparatorColor;
+                    theme.FooterBorderColor = def.FooterBorderColor;
+                    theme.ToggleActiveColor = def.ToggleActiveColor;
+                }
+            });
+
+            EditorGUILayout.Space();
+            Horizontal(() =>
             {
-                var fi = currentTheme.GetType().GetField(name);
-                fi.SetValue(currentTheme, val);
-            };
-
-            Color bg = get("BackgroundColor");
-            Color ac = get("AccentColor");
-            Color sep = get("SeparatorColor");
-            Color foot = get("FooterBorderColor");
-            Color tog = get("ToggleActiveColor");
-
-            bg = ColorPicker("Background", bg);
-            ac = ColorPicker("Accent", ac);
-            sep = ColorPicker("Separator", sep);
-            foot = ColorPicker("Footer Border", foot);
-            tog = ColorPicker("Toggle Active", tog);
-
-            set("BackgroundColor", bg);
-            set("AccentColor", ac);
-            set("SeparatorColor", sep);
-            set("FooterBorderColor", foot);
-            set("ToggleActiveColor", tog);
-
-            // Call SaveTheme via reflection (protected method)
-            var saveThemeMi = typeof(KEditorWindow<ExampleWindow>).GetMethod("SaveTheme", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-            saveThemeMi?.Invoke(this, null);
+                if (AccentButton("Save Window Theme", EditorStyle.Button, LayoutOption.Width150))
+                {
+                    EditorThemeManager.SaveThemeForWindow(typeof(ExampleWindow), theme);
+                }
+                if (ColoredButton("Reset To Global", Color.red, EditorStyle.Button, LayoutOption.Width150))
+                {
+                    EditorThemeManager.ResetThemeForWindow(typeof(ExampleWindow));
+                }
+                if (Button("Open Global Theme Preferences", null, null, EditorStyle.Button, LayoutOption.Width200))
+                {
+                    SettingsService.OpenUserPreferences("Preferences/KEditor/Theme");
+                }
+            });
         });
 
         EditorGUILayout.Space();
-        Footer("Theme changes are saved per-window type.");
+        Footer("Theme changes can be saved per-window or globally in Preferences.");
     }
 }
 #endif

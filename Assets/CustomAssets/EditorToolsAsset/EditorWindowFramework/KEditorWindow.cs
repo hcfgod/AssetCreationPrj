@@ -426,20 +426,20 @@ namespace CustomAssets.EditorTools
         /// </summary>
         protected void Footer(string left, string right = null)
         {
-            Rect r = GUILayoutUtility.GetRect(0, 20, GUILayout.ExpandWidth(true));
+            Rect r = GUILayoutUtility.GetRect(0, 22, GUILayout.ExpandWidth(true));
             if (Event.current.type == EventType.Repaint)
             {
                 // Background
                 EditorGUI.DrawRect(r, CurrentTheme.PanelBackgroundColor);
-                // Top accent border
-                var top = new Rect(r.x, r.y, r.width, 1f);
-                EditorGUI.DrawRect(top, CurrentTheme.FooterBorderColor);
+                // Top accent border with spacing from the outer top border
+                EditorGUI.DrawRect(new Rect(r.x, r.y + 1f, r.width, 1f), CurrentTheme.PanelBorderColor);
                 // Outer border
                 var borderColor = CurrentTheme.PanelBorderColor;
                 EditorGUI.DrawRect(new Rect(r.x, r.y, 1f, r.height), borderColor);
                 EditorGUI.DrawRect(new Rect(r.xMax - 1f, r.y, 1f, r.height), borderColor);
                 EditorGUI.DrawRect(new Rect(r.x, r.yMax - 1f, r.width, 1f), borderColor);
             }
+            
             r.x += 6; r.width -= 12;
             var leftRect = new Rect(r.x, r.y, r.width * 0.6f, r.height);
             var rightRect = new Rect(r.x + r.width * 0.6f, r.y, r.width * 0.4f, r.height);
@@ -766,7 +766,14 @@ namespace CustomAssets.EditorTools
         {
             if (options == null || options.Length == 0) return -1;
             int columns = Mathf.Min(maxColumns, options.Length);
-            return GUILayout.SelectionGrid(selected, options, columns, options_);
+            GUIStyle itemStyle = new GUIStyle(EditorStyles.miniButton);
+            itemStyle.alignment = TextAnchor.MiddleCenter;
+            itemStyle.wordWrap = true;
+            itemStyle.normal.textColor = CurrentTheme.ButtonTextColor;
+            itemStyle.onNormal.textColor = CurrentTheme.ButtonTextColor;
+            itemStyle.hover.textColor = CurrentTheme.ButtonTextColor;
+            itemStyle.active.textColor = CurrentTheme.ButtonTextColor;
+            return GUILayout.SelectionGrid(selected, options, columns, itemStyle, options_);
         }
 
         /// <summary>
@@ -820,8 +827,19 @@ namespace CustomAssets.EditorTools
             bool wasEnabled = GUI.enabled;
             GUI.enabled = condition;
 
+            Color originalBg = GUI.backgroundColor; Color originalText = GUI.contentColor;
+            GUI.backgroundColor = CurrentTheme.ButtonNormalColor;
+            GUI.contentColor = CurrentTheme.ButtonTextColor;
             GUIContent content = new GUIContent(text, condition ? null : disabledTooltip);
-            bool clicked = GUILayout.Button(content);
+            bool clicked = GUILayout.Button(content, EditorStyleConverter.ToGUIStyle(EditorStyle.Button));
+            // Border
+            Rect br = GUILayoutUtility.GetLastRect();
+            var borderColor = CurrentTheme.ButtonBorderColor;
+            EditorGUI.DrawRect(new Rect(br.x, br.y, br.width, 1f), borderColor);
+            EditorGUI.DrawRect(new Rect(br.x, br.yMax - 1f, br.width, 1f), borderColor);
+            EditorGUI.DrawRect(new Rect(br.x, br.y, 1f, br.height), borderColor);
+            EditorGUI.DrawRect(new Rect(br.xMax - 1f, br.y, 1f, br.height), borderColor);
+            GUI.backgroundColor = originalBg; GUI.contentColor = originalText;
 
             GUI.enabled = wasEnabled;
             return clicked;
@@ -849,14 +867,20 @@ namespace CustomAssets.EditorTools
         protected bool ToggleButton(string text, bool value, EditorStyle style = EditorStyle.Button, params LayoutOption[] options)
         {
             Color originalColor = GUI.backgroundColor;
-            if (value)
-            {
-                GUI.backgroundColor = CurrentTheme.ToggleActiveColor;
-            }
-
+            Color originalText = GUI.contentColor;
+            GUI.backgroundColor = value ? CurrentTheme.ToggleActiveColor : CurrentTheme.ButtonNormalColor;
+            GUI.contentColor = CurrentTheme.ButtonTextColor;
             GUIStyle guiStyle = style == EditorStyle.Default ? GUIStyle.none : EditorStyleConverter.ToGUIStyle(style);
             bool clicked = GUILayout.Button(text, guiStyle, LayoutOptionConverter.ToGUILayoutOptions(options));
+            // Border
+            Rect br = GUILayoutUtility.GetLastRect();
+            var borderColor = CurrentTheme.ButtonBorderColor;
+            EditorGUI.DrawRect(new Rect(br.x, br.y, br.width, 1f), borderColor);
+            EditorGUI.DrawRect(new Rect(br.x, br.yMax - 1f, br.width, 1f), borderColor);
+            EditorGUI.DrawRect(new Rect(br.x, br.y, 1f, br.height), borderColor);
+            EditorGUI.DrawRect(new Rect(br.xMax - 1f, br.y, 1f, br.height), borderColor);
             GUI.backgroundColor = originalColor;
+            GUI.contentColor = originalText;
 
             return clicked ? !value : value;
         }
@@ -962,7 +986,14 @@ namespace CustomAssets.EditorTools
         /// </summary>
         protected float Slider(string label, float value, float leftValue, float rightValue, EditorStyle style = EditorStyle.Label)
         {
-            return EditorGUILayout.Slider(label, value, leftValue, rightValue);
+            Rect r = EditorGUILayout.GetControlRect();
+            // Draw themed track behind the real slider
+            float t = Mathf.InverseLerp(leftValue, rightValue, value);
+            float barX = r.x + EditorGUIUtility.labelWidth;
+            Rect bar = new Rect(barX, r.y + (r.height - 6f) * 0.5f, r.width - (barX - r.x), 6f);
+            EditorGUI.DrawRect(bar, CurrentTheme.ProgressBackgroundColor);
+            EditorGUI.DrawRect(new Rect(bar.x, bar.y, Mathf.Max(0, bar.width * t), bar.height), CurrentTheme.ProgressFillColor);
+            return EditorGUI.Slider(r, label, value, leftValue, rightValue);
         }
 
         /// <summary>
@@ -970,7 +1001,13 @@ namespace CustomAssets.EditorTools
         /// </summary>
         protected int IntSlider(string label, int value, int leftValue, int rightValue, EditorStyle style = EditorStyle.Label)
         {
-            return EditorGUILayout.IntSlider(label, value, leftValue, rightValue);
+            Rect r = EditorGUILayout.GetControlRect();
+            float t = Mathf.InverseLerp(leftValue, rightValue, value);
+            float barX = r.x + EditorGUIUtility.labelWidth;
+            Rect bar = new Rect(barX, r.y + (r.height - 6f) * 0.5f, r.width - (barX - r.x), 6f);
+            EditorGUI.DrawRect(bar, CurrentTheme.ProgressBackgroundColor);
+            EditorGUI.DrawRect(new Rect(bar.x, bar.y, Mathf.Max(0, bar.width * t), bar.height), CurrentTheme.ProgressFillColor);
+            return (int)EditorGUI.Slider(r, label, value, leftValue, rightValue);
         }
 
         /// <summary>
@@ -1023,7 +1060,7 @@ namespace CustomAssets.EditorTools
         /// <summary>
         /// Creates a button with customizable colors and styling.
         /// </summary>
-        protected bool Button(string text, Color? backgroundColor = null, Color? textColor = null, EditorStyle style = EditorStyle.Default, params LayoutOption[] options)
+        protected bool Button(string text, Color? backgroundColor = null, Color? textColor = null, EditorStyle style = EditorStyle.Button, params LayoutOption[] options)
         {
             Color originalBg = GUI.backgroundColor;
             Color originalText = GUI.contentColor;

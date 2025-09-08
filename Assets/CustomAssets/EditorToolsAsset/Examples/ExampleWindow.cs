@@ -375,10 +375,8 @@ public class ExampleWindow : KEditorWindow<ExampleWindow>
 
         Foldout("theme_colors", "Per-Window Colors", () =>
         {
-            theme.BackgroundColor   = ColorPicker("Background", theme.BackgroundColor);
             theme.AccentColor       = ColorPicker("Accent", theme.AccentColor);
             theme.SeparatorColor    = ColorPicker("Separator", theme.SeparatorColor);
-            theme.FooterBorderColor = ColorPicker("Footer Border", theme.FooterBorderColor);
             theme.ToggleActiveColor = ColorPicker("Toggle Active", theme.ToggleActiveColor);
 
             EditorGUILayout.Space();
@@ -407,19 +405,15 @@ public class ExampleWindow : KEditorWindow<ExampleWindow>
                 if (Button("Apply Light Defaults", null, null, EditorStyle.MiniButton, LayoutOption.Width150))
                 {
                     var def = EditorTheme.DefaultLight();
-                    theme.BackgroundColor   = def.BackgroundColor;
                     theme.AccentColor       = def.AccentColor;
                     theme.SeparatorColor    = def.SeparatorColor;
-                    theme.FooterBorderColor = def.FooterBorderColor;
                     theme.ToggleActiveColor = def.ToggleActiveColor;
                 }
                 if (Button("Apply Dark Defaults", null, null, EditorStyle.MiniButton, LayoutOption.Width150))
                 {
                     var def = EditorTheme.DefaultDark();
-                    theme.BackgroundColor   = def.BackgroundColor;
                     theme.AccentColor       = def.AccentColor;
                     theme.SeparatorColor    = def.SeparatorColor;
-                    theme.FooterBorderColor = def.FooterBorderColor;
                     theme.ToggleActiveColor = def.ToggleActiveColor;
                 }
             });

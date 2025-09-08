@@ -111,10 +111,8 @@ namespace CustomAssets.EditorTools
 
         private static bool HasAnyColor(string prefix)
         {
-            return EditorPrefs.HasKey(prefix + "bg.r") ||
-                   EditorPrefs.HasKey(prefix + "accent.r") ||
+            return EditorPrefs.HasKey(prefix + "accent.r") ||
                    EditorPrefs.HasKey(prefix + "sep.r") ||
-                   EditorPrefs.HasKey(prefix + "footer.r") ||
                    EditorPrefs.HasKey(prefix + "toggle.r") ||
                    EditorPrefs.HasKey(prefix + "text.r") ||
                    EditorPrefs.HasKey(prefix + "subtext.r") ||
@@ -132,10 +130,8 @@ namespace CustomAssets.EditorTools
         private static void CopyInto(EditorTheme src, EditorTheme dst)
         {
             if (src == null || dst == null) return;
-            dst.BackgroundColor = src.BackgroundColor;
             dst.AccentColor = src.AccentColor;
             dst.SeparatorColor = src.SeparatorColor;
-            dst.FooterBorderColor = src.FooterBorderColor;
             dst.ToggleActiveColor = src.ToggleActiveColor;
             dst.TextColor = src.TextColor;
             dst.SubTextColor = src.SubTextColor;

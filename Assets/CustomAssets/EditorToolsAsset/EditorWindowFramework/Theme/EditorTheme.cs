@@ -7,10 +7,8 @@ namespace CustomAssets.EditorTools
     [System.Serializable]
     public class EditorTheme
     {
-        public Color BackgroundColor = new Color(0.13f, 0.13f, 0.13f);
         public Color AccentColor = new Color(0.2f, 0.6f, 1f);
         public Color SeparatorColor = new Color(0.3f, 0.3f, 0.3f);
-        public Color FooterBorderColor = new Color(0f, 0f, 0f, 0.15f);
         public Color ToggleActiveColor = new Color(0.7f, 1f, 0.7f);
 
         // Extended theming
@@ -33,10 +31,8 @@ namespace CustomAssets.EditorTools
         {
             return new EditorTheme
             {
-                BackgroundColor = this.BackgroundColor,
                 AccentColor = this.AccentColor,
                 SeparatorColor = this.SeparatorColor,
-                FooterBorderColor = this.FooterBorderColor,
                 ToggleActiveColor = this.ToggleActiveColor,
                 TextColor = this.TextColor,
                 SubTextColor = this.SubTextColor,
@@ -61,10 +57,8 @@ namespace CustomAssets.EditorTools
         {
             return new EditorTheme
             {
-                BackgroundColor = new Color(0.13f, 0.13f, 0.13f),
                 AccentColor = new Color(0.2f, 0.6f, 1f),
                 SeparatorColor = new Color(0.3f, 0.3f, 0.3f),
-                FooterBorderColor = new Color(0f, 0f, 0f, 0.15f),
                 ToggleActiveColor = new Color(0.7f, 1f, 0.7f),
                 TextColor = new Color(0.85f, 0.85f, 0.85f),
                 SubTextColor = new Color(0.7f, 0.7f, 0.7f),
@@ -84,10 +78,8 @@ namespace CustomAssets.EditorTools
         {
             return new EditorTheme
             {
-                BackgroundColor = new Color(0.92f, 0.92f, 0.92f),
                 AccentColor = new Color(0.24f, 0.5f, 0.9f),
                 SeparatorColor = new Color(0.75f, 0.75f, 0.75f),
-                FooterBorderColor = new Color(0f, 0f, 0f, 0.1f),
                 ToggleActiveColor = new Color(0.55f, 0.9f, 0.55f),
                 TextColor = new Color(0.1f, 0.1f, 0.1f),
                 SubTextColor = new Color(0.25f, 0.25f, 0.25f),
@@ -106,10 +98,8 @@ namespace CustomAssets.EditorTools
         public static EditorTheme LoadFromPrefs(string prefix, EditorTheme fallback = null)
         {
             var baseTheme = (fallback ?? Default()).Clone();
-            baseTheme.BackgroundColor   = LoadColor(prefix + "bg", baseTheme.BackgroundColor);
             baseTheme.AccentColor       = LoadColor(prefix + "accent", baseTheme.AccentColor);
             baseTheme.SeparatorColor    = LoadColor(prefix + "sep", baseTheme.SeparatorColor);
-            baseTheme.FooterBorderColor = LoadColor(prefix + "footer", baseTheme.FooterBorderColor);
             baseTheme.ToggleActiveColor = LoadColor(prefix + "toggle", baseTheme.ToggleActiveColor);
             baseTheme.TextColor         = LoadColor(prefix + "text", baseTheme.TextColor);
             baseTheme.SubTextColor      = LoadColor(prefix + "subtext", baseTheme.SubTextColor);
@@ -127,10 +117,8 @@ namespace CustomAssets.EditorTools
 
         public void SaveToPrefs(string prefix)
         {
-            SaveColor(prefix + "bg", BackgroundColor);
             SaveColor(prefix + "accent", AccentColor);
             SaveColor(prefix + "sep", SeparatorColor);
-            SaveColor(prefix + "footer", FooterBorderColor);
             SaveColor(prefix + "toggle", ToggleActiveColor);
             SaveColor(prefix + "text", TextColor);
             SaveColor(prefix + "subtext", SubTextColor);
@@ -147,10 +135,8 @@ namespace CustomAssets.EditorTools
 
         public static void DeleteFromPrefs(string prefix)
         {
-            DeleteColor(prefix + "bg");
             DeleteColor(prefix + "accent");
             DeleteColor(prefix + "sep");
-            DeleteColor(prefix + "footer");
             DeleteColor(prefix + "toggle");
             DeleteColor(prefix + "text");
             DeleteColor(prefix + "subtext");

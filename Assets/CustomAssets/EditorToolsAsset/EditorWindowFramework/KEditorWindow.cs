@@ -302,6 +302,328 @@ namespace CustomAssets.EditorTools
         /// </summary>
         protected virtual void OnSearchChanged(string newQuery) { }
 
+        /// <summary>
+        /// Draws a progress bar with optional label and percentage display.
+        /// </summary>
+        protected void ProgressBar(float progress, string label = null, bool showPercentage = true)
+        {
+            progress = Mathf.Clamp01(progress);
+            Rect rect = EditorGUILayout.GetControlRect(false, 18f);
+
+            if (Event.current.type == EventType.Repaint)
+            {
+                EditorGUI.DrawRect(rect, new Color(0.13f, 0.13f, 0.13f));
+                Rect fillRect = new Rect(rect.x + 1, rect.y + 1, (rect.width - 2) * progress, rect.height - 2);
+                EditorGUI.DrawRect(fillRect, new Color(0.2f, 0.6f, 1f));
+            }
+
+            string displayText = label ?? string.Empty;
+            if (showPercentage)
+            {
+                string percent = $"{(progress * 100):F0}%";
+                displayText = string.IsNullOrEmpty(displayText) ? percent : $"{displayText} ({percent})";
+            }
+
+            if (!string.IsNullOrEmpty(displayText))
+            {
+                GUI.Label(rect, displayText, EditorStyles.centeredGreyMiniLabel);
+            }
+        }
+
+        /// <summary>
+        /// Draws an asset preview thumbnail with optional label. Returns true if clicked.
+        /// </summary>
+        protected bool AssetPreview(Object asset, float size = 64f, string label = null)
+        {
+            if (asset == null) return false;
+
+            bool clicked = false;
+            Vertical(() =>
+            {
+                Texture2D preview = UnityEditor.AssetPreview.GetAssetPreview(asset);
+                if (preview != null)
+                {
+                    Rect rect = GUILayoutUtility.GetRect(size, size, GUILayout.Width(size), GUILayout.Height(size));
+                    if (GUI.Button(rect, preview, GUIStyle.none))
+                    {
+                        clicked = true;
+                    }
+                }
+                else
+                {
+                    Rect rect = GUILayoutUtility.GetRect(size, size, GUILayout.Width(size), GUILayout.Height(size));
+                    if (GUI.Button(rect, "?", EditorStyles.miniButton))
+                    {
+                        clicked = true;
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(label))
+                {
+                    EditorGUILayout.LabelField(label, EditorStyles.centeredGreyMiniLabel, GUILayout.Width(size));
+                }
+            });
+
+            return clicked;
+        }
+
+        /// <summary>
+        /// Creates a foldout group that persists its state in EditorPrefs.
+        /// </summary>
+        protected bool Foldout(string key, string label, System.Action content, bool defaultExpanded = false)
+        {
+            bool expanded = EditorPrefs.GetBool(GetPrefsKey($"foldout.{key}"), defaultExpanded);
+            bool newExpanded = EditorGUILayout.Foldout(expanded, label, true);
+
+            if (newExpanded != expanded)
+            {
+                EditorPrefs.SetBool(GetPrefsKey($"foldout.{key}"), newExpanded);
+            }
+
+            if (newExpanded)
+            {
+                EditorGUI.indentLevel++;
+                content?.Invoke();
+                EditorGUI.indentLevel--;
+            }
+
+            return newExpanded;
+        }
+
+        /// <summary>
+        /// Tab group that persists selected tab in EditorPrefs.
+        /// </summary>
+        protected int TabGroup(string key, string[] tabLabels, System.Action<int>[] tabContents, int defaultTab = 0)
+        {
+            if (tabLabels == null || tabLabels.Length == 0) return -1;
+
+            int selectedTab = EditorPrefs.GetInt(GetPrefsKey($"tab.{key}"), defaultTab);
+            selectedTab = Mathf.Clamp(selectedTab, 0, tabLabels.Length - 1);
+
+            int newSelectedTab = GUILayout.Toolbar(selectedTab, tabLabels);
+            if (newSelectedTab != selectedTab)
+            {
+                EditorPrefs.SetInt(GetPrefsKey($"tab.{key}"), newSelectedTab);
+                selectedTab = newSelectedTab;
+            }
+
+            GUILayout.Space(4);
+
+            if (tabContents != null && selectedTab < tabContents.Length)
+            {
+                tabContents[selectedTab]?.Invoke(selectedTab);
+            }
+
+            return selectedTab;
+        }
+
+        /// <summary>
+        /// Enhanced color field with preset colors and optional alpha.
+        /// </summary>
+        protected Color ColorPicker(string label, Color color, bool showAlpha = true, params Color[] presets)
+        {
+            Color newColor = color;
+
+            EditorGUILayout.BeginHorizontal();
+            {
+                EditorGUILayout.LabelField(label, GUILayout.Width(EditorGUIUtility.labelWidth));
+                newColor = EditorGUILayout.ColorField(color, GUILayout.ExpandWidth(false));
+
+                if (presets != null && presets.Length > 0)
+                {
+                    GUILayout.Space(4);
+                    foreach (var preset in presets)
+                    {
+                        Rect presetRect = GUILayoutUtility.GetRect(16, 16, GUILayout.Width(16), GUILayout.Height(16));
+                        if (Event.current.type == EventType.Repaint)
+                        {
+                            EditorGUI.DrawRect(presetRect, preset);
+                        }
+                        if (GUI.Button(presetRect, GUIContent.none, GUIStyle.none))
+                        {
+                            newColor = showAlpha ? preset : new Color(preset.r, preset.g, preset.b, color.a);
+                        }
+                    }
+                }
+            }
+            EditorGUILayout.EndHorizontal();
+
+            return newColor;
+        }
+
+        /// <summary>
+        /// Draws a help box with different message types.
+        /// </summary>
+        protected void HelpBox(string message, MessageType messageType = MessageType.Info)
+        {
+            EditorGUILayout.HelpBox(message, messageType);
+        }
+
+        /// <summary>
+        /// Creates a two-column layout helper.
+        /// </summary>
+        protected void TwoColumns(System.Action leftColumn, System.Action rightColumn, float leftWidth = 200f)
+        {
+            EditorGUILayout.BeginHorizontal();
+            {
+                EditorGUILayout.BeginVertical(GUILayout.Width(leftWidth));
+                leftColumn?.Invoke();
+                EditorGUILayout.EndVertical();
+
+                EditorGUILayout.BeginVertical();
+                rightColumn?.Invoke();
+                EditorGUILayout.EndVertical();
+            }
+            EditorGUILayout.EndHorizontal();
+        }
+
+        /// <summary>
+        /// Creates a button with an icon and text.
+        /// </summary>
+        protected bool IconButton(string text, string iconName, params GUILayoutOption[] options)
+        {
+            Texture2D icon = EditorGUIUtility.IconContent(iconName).image as Texture2D;
+            GUIContent content = new GUIContent(text, icon);
+            return GUILayout.Button(content, options);
+        }
+
+        /// <summary>
+        /// Creates a selection grid with automatic wrapping.
+        /// </summary>
+        protected int SelectionGrid(int selected, string[] options, int maxColumns = 3, params GUILayoutOption[] options_)
+        {
+            if (options == null || options.Length == 0) return -1;
+            int columns = Mathf.Min(maxColumns, options.Length);
+            return GUILayout.SelectionGrid(selected, options, columns, options_);
+        }
+
+        /// <summary>
+        /// Enhanced object field with drag-and-drop highlight.
+        /// </summary>
+        protected TObject ObjectField<TObject>(string label, TObject obj, bool allowSceneObjects = true) where TObject : Object
+        {
+            return EditorGUILayout.ObjectField(label, obj, typeof(TObject), allowSceneObjects) as TObject;
+        }
+
+        /// <summary>
+        /// Creates a min-max slider.
+        /// </summary>
+        protected void MinMaxSlider(string label, ref float minValue, ref float maxValue, float minLimit, float maxLimit)
+        {
+            EditorGUILayout.BeginHorizontal();
+            {
+                EditorGUILayout.LabelField(label, GUILayout.Width(EditorGUIUtility.labelWidth));
+                EditorGUILayout.MinMaxSlider(ref minValue, ref maxValue, minLimit, maxLimit);
+                minValue = EditorGUILayout.FloatField(minValue, GUILayout.Width(50));
+                maxValue = EditorGUILayout.FloatField(maxValue, GUILayout.Width(50));
+            }
+            EditorGUILayout.EndHorizontal();
+        }
+
+        /// <summary>
+        /// Creates a centered label with optional styling.
+        /// </summary>
+        protected void CenteredLabel(string text, bool bold = false, int fontSize = 0)
+        {
+            GUIStyle style = new GUIStyle(EditorStyles.label)
+            {
+                alignment = TextAnchor.MiddleCenter,
+                fontStyle = bold ? FontStyle.Bold : FontStyle.Normal
+            };
+
+            if (fontSize > 0)
+            {
+                style.fontSize = fontSize;
+            }
+
+            EditorGUILayout.LabelField(text, style);
+        }
+
+        /// <summary>
+        /// Creates a button that's only enabled if a condition is met.
+        /// </summary>
+        protected bool ConditionalButton(string text, bool condition, string disabledTooltip = null)
+        {
+            bool wasEnabled = GUI.enabled;
+            GUI.enabled = condition;
+
+            GUIContent content = new GUIContent(text, condition ? null : disabledTooltip);
+            bool clicked = GUILayout.Button(content);
+
+            GUI.enabled = wasEnabled;
+            return clicked;
+        }
+
+        /// <summary>
+        /// Creates a toggle button that shows its state visually.
+        /// </summary>
+        protected bool ToggleButton(string text, bool value, params GUILayoutOption[] options)
+        {
+            Color originalColor = GUI.backgroundColor;
+            if (value)
+            {
+                GUI.backgroundColor = new Color(0.7f, 1f, 0.7f);
+            }
+
+            bool clicked = GUILayout.Button(text, options);
+            GUI.backgroundColor = originalColor;
+
+            return clicked ? !value : value;
+        }
+
+        /// <summary>
+        /// Creates a property-like field for Vector2.
+        /// </summary>
+        protected Vector2 Vector2Field(string label, Vector2 value)
+        {
+            return EditorGUILayout.Vector2Field(label, value);
+        }
+
+        /// <summary>
+        /// Creates a property-like field for Vector3.
+        /// </summary>
+        protected Vector3 Vector3Field(string label, Vector3 value)
+        {
+            return EditorGUILayout.Vector3Field(label, value);
+        }
+
+        /// <summary>
+        /// Creates a simple enum popup.
+        /// </summary>
+        protected TEnum EnumPopup<TEnum>(string label, TEnum value) where TEnum : System.Enum
+        {
+            return (TEnum)EditorGUILayout.EnumPopup(label, value);
+        }
+
+        /// <summary>
+        /// Creates a simple mask field for LayerMask.
+        /// </summary>
+        protected LayerMask LayerMaskField(string label, LayerMask layerMask)
+        {
+            return EditorGUILayout.MaskField(label, layerMask, UnityEditorInternal.InternalEditorUtility.layers);
+        }
+
+        /// <summary>
+        /// Draws a texture with aspect ratio preserved.
+        /// </summary>
+        protected void DrawTexture(Texture2D texture, float maxWidth = 200f, float maxHeight = 200f)
+        {
+            if (texture == null) return;
+
+            float aspectRatio = (float)texture.width / texture.height;
+            float width = Mathf.Min(maxWidth, texture.width);
+            float height = width / aspectRatio;
+
+            if (height > maxHeight)
+            {
+                height = maxHeight;
+                width = height * aspectRatio;
+            }
+
+            Rect rect = GUILayoutUtility.GetRect(width, height, GUILayout.Width(width), GUILayout.Height(height));
+            GUI.DrawTexture(rect, texture);
+        }
+        
         // =============== Hooks management ===============
 
         /// <summary>

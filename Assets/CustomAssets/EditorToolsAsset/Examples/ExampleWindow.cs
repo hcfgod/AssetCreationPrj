@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
 using CustomAssets.EditorTools;
@@ -12,11 +13,44 @@ public class ExampleWindow : KEditorWindow<ExampleWindow>
 
     private void OnGUI()
     {
-        GUILayout.Label("Hello from My Tool!", EditorStyles.boldLabel);
+        // Toolbar with search
+        Toolbar(
+            drawLeft: () =>
+            {
+                if (GUILayout.Button("Refresh", EditorStyles.toolbarButton))
+                {
+                    Repaint();
+                }
+            },
+            drawRight: () =>
+            {
+                if (GUILayout.Button("Help", EditorStyles.toolbarButton))
+                {
+                    EditorUtility.DisplayDialog("Help", "This is an example editor window using KEditorWindow helpers.", "OK");
+                }
+            },
+            includeSearch: true,
+            searchPlaceholder: "Filter items..."
+        );
 
-        if (GUILayout.Button("Do Something"))
+        Header("Contents");
+        Separator();
+
+        ScrollView(() =>
         {
-            Debug.Log("Button pressed!");
-        }
+            for (int i = 0; i < 50; i++)
+            {
+                string label = $"Item {i}";
+                if (!string.IsNullOrEmpty(SearchQuery) && !label.ToLowerInvariant().Contains(SearchQuery.ToLowerInvariant()))
+                    continue;
+                if (GUILayout.Button(label))
+                {
+                    Debug.Log($"Clicked {label}");
+                }
+            }
+        });
+
+        Footer($"Search: '{SearchQuery}'", System.DateTime.Now.ToShortTimeString());
     }
 }
+#endif

@@ -37,6 +37,7 @@ public class Example : MonoBehaviour
 ```
 
 ## Feature Summary (at a glance)
+- Editor Windows: KEditorWindow framework (scrollable windows, theming, toolbar, layout helpers)
 - Layout & UX: Title, InfoBox, ProgressBar, AssetPreview, FoldoutGroup, TabGroup, ReorderableList
 - Data & Validation: SerializableDictionary, ValidateInput (+ Min/Max/Range/Regex/NotNull/NotEmpty/NonZero), MinMaxSlider
 - Actions: Button (invoke methods safely from the Inspector)
@@ -44,6 +45,81 @@ public class Example : MonoBehaviour
 
 ## Examples
 See `Assets/CustomAssets/EditorToolsAsset/Examples/` for concise patterns you can copy into production.
+
+---
+
+## KEditorWindow Framework (Editor window toolkit)
+
+Build consistent, themeable, scrollable editor windows quickly.
+
+### Highlights
+- Scrollable by default; override only `DrawWindowContents()`
+- Built‑in toolbar with optional search
+- Rich helpers: layout, inputs, selection, previews, progress, dropdown menus
+- Centralized theming via Preferences and per‑window overrides
+
+### Quick example
+```csharp
+using UnityEngine;
+using UnityEditor;
+using CustomAssets.EditorTools;
+
+public class MyToolWindow : KEditorWindow<MyToolWindow>
+{
+	[MenuItem("Tools/My Tool")] public static void Open() => ShowWindow("My Tool");
+
+	protected override void DrawWindowContents()
+	{
+		Toolbar(
+			drawLeft: () => { if (Button("Refresh", style: EditorStyle.ToolbarButton)) Repaint(); },
+			drawRight: () => { DropdownButton("Actions", m => { m.AddItem(new GUIContent("Do Thing"), false, () => Debug.Log("Thing")); }); },
+			includeSearch: true
+		);
+
+		Header("Controls");
+		Horizontal(() =>
+		{
+			if (AccentButton("Run", EditorStyle.Button, LayoutOption.Width100)) { /* ... */ }
+			if (ToggleButton("Flag", false)) { /* toggled */ }
+		});
+
+		Foldout("section", "Advanced", () =>
+		{
+			var col = ColorPicker("Tint", Color.white);
+			ProgressBar(0.42f, "Processing", showPercentage: true);
+		});
+
+		Footer($"Search: '{SearchQuery}'");
+	}
+}
+```
+
+### Common helpers (selected)
+- Layout: `Horizontal`, `Vertical`, `Box`, `TwoColumns(left,right,leftWidth)`
+- Structure: `Header`, `Separator`, `Foldout(key,label,content)`, `TabGroup(key, labels, contents)`
+- Toolbar & search: `Toolbar(drawLeft, drawRight, includeSearch, searchPlaceholder)`
+- Buttons: `Button`, `AccentButton`, `ColoredButton`, `IconButton`, `ToggleButton`, `ConditionalButton`
+- Inputs: `TextField`, `TextArea`, `PasswordField`, `FloatField`, `IntField`, `Vector2Field`, `Vector3Field`, `EnumPopup`, `LayerMaskField`
+- Selection: `SelectionGrid(selected, options, maxColumns)`
+- Menus: `DropdownButton(text, buildMenu)`, `PopupField(label, selected, options)`
+- Visuals: `AssetPreview(Object,size,label)`, `DrawTexture`, `ProgressBar`
+
+### Styling & Layout enums
+- `EditorStyle` maps to Unity `EditorStyles` (e.g., `Button`, `MiniButton`, `ToolbarButton`, `BoldLabel`, `Popup`, `Foldout`, `Toggle`, `ColorField`, `ObjectField`, `LayerMaskField`, `FoldoutHeader`, `Toolbar`, `ToolbarDropDown`, `ToolbarPopup`, `ToolbarTextField`).
+- `LayoutOption` provides convenient sizes: `Width60/80/100/120/150/200`, `Height18/20/24/30/40/50`, `MinWidth50/100/120`, `MaxWidth200/300/400`, `ExpandWidth/ExpandHeight`.
+
+### Theming
+- Global theme: Preferences → `KEditor/Theme` (all extended colors are editable)
+	- Text, Sub Text, Header Text
+	- Panel Background, Panel Border
+	- Button Background/Text/Border
+	- Progress Background/Fill/Text
+- Per‑window theme: use the Theme tab in the example or call `SaveTheme()` after edits
+- Theme changes propagate live via `EditorThemeManager.ThemeChanged`
+
+Notes:
+- Some native controls (e.g., Unity pickers) can’t be fully re‑skinned. We frame them with themed borders/backgrounds for consistency.
+- `DropdownButton` opens a `GenericMenu` at the cursor and supports any actions you add to the menu builder.
 
 ---
 

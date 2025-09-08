@@ -127,7 +127,7 @@ namespace CustomAssets.EditorTools.Editor
 
                 var header = new VisualElement { name = "ProjectPopupHeader" };
                 header.style.height = 22;
-                header.style.flexShrink = 0;
+header.style.flexShrink = 0;
                 header.style.backgroundColor = new Color(0.15f, 0.15f, 0.15f);
                 header.style.borderBottomWidth = 1;
                 header.style.borderBottomColor = new Color(0f, 0f, 0f, 0.35f);
@@ -135,6 +135,9 @@ namespace CustomAssets.EditorTools.Editor
                 header.style.paddingRight = 6;
                 header.style.alignItems = Align.Center;
                 header.style.width = new StyleLength(new Length(100, LengthUnit.Percent));
+                // Ensure header captures pointer events and sits above underlying content
+                header.pickingMode = PickingMode.Position;
+                // Block tooltip/mouse-move from passing to underlying controls
 
                 var title = new Label("Project");
                 title.style.color = Color.white;
@@ -150,13 +153,14 @@ namespace CustomAssets.EditorTools.Editor
                 search.style.minWidth = 0; // allow shrinking within row
                 search.style.marginLeft = 0;
                 search.style.marginRight = 6;
-                search.tooltip = "Search assets";
+search.tooltip = "Search assets";
 
                 var headerRow = new VisualElement();
                 headerRow.style.flexDirection = FlexDirection.Row;
                 headerRow.style.flexGrow = 1;
                 headerRow.style.alignItems = Align.Center;
                 headerRow.style.width = new StyleLength(new Length(100, LengthUnit.Percent));
+                headerRow.pickingMode = PickingMode.Position;
 
                 var closeBtn = new Button(() =>
                 {
@@ -177,10 +181,12 @@ namespace CustomAssets.EditorTools.Editor
                 headerRow.Add(closeBtn);
                 header.Add(headerRow);
 
-                // Insert at top so it pushes content down
+                // Insert header at top so it pushes content down
                 root.Insert(0, header);
 
-                // As-you-type: update Project Browser filter without changing selection
+
+
+                // Hook search change -> select matching assets in Project
                 search.RegisterValueChangedCallback(evt =>
                 {
                     UpdateProjectSearchText(evt.newValue);
@@ -241,6 +247,7 @@ namespace CustomAssets.EditorTools.Editor
             }
             catch { }
         }
+
 
         private static void DragUpdate()
         {

@@ -115,7 +115,18 @@ namespace CustomAssets.EditorTools
                    EditorPrefs.HasKey(prefix + "accent.r") ||
                    EditorPrefs.HasKey(prefix + "sep.r") ||
                    EditorPrefs.HasKey(prefix + "footer.r") ||
-                   EditorPrefs.HasKey(prefix + "toggle.r");
+                   EditorPrefs.HasKey(prefix + "toggle.r") ||
+                   EditorPrefs.HasKey(prefix + "text.r") ||
+                   EditorPrefs.HasKey(prefix + "subtext.r") ||
+                   EditorPrefs.HasKey(prefix + "headerText.r") ||
+                   EditorPrefs.HasKey(prefix + "panelBg.r") ||
+                   EditorPrefs.HasKey(prefix + "panelBorder.r") ||
+                   EditorPrefs.HasKey(prefix + "btnBg.r") ||
+                   EditorPrefs.HasKey(prefix + "btnText.r") ||
+                   EditorPrefs.HasKey(prefix + "btnBorder.r") ||
+                   EditorPrefs.HasKey(prefix + "progBg.r") ||
+                   EditorPrefs.HasKey(prefix + "progFill.r") ||
+                   EditorPrefs.HasKey(prefix + "progText.r");
         }
 
         private static void CopyInto(EditorTheme src, EditorTheme dst)
@@ -126,6 +137,17 @@ namespace CustomAssets.EditorTools
             dst.SeparatorColor = src.SeparatorColor;
             dst.FooterBorderColor = src.FooterBorderColor;
             dst.ToggleActiveColor = src.ToggleActiveColor;
+            dst.TextColor = src.TextColor;
+            dst.SubTextColor = src.SubTextColor;
+            dst.HeaderTextColor = src.HeaderTextColor;
+            dst.PanelBackgroundColor = src.PanelBackgroundColor;
+            dst.PanelBorderColor = src.PanelBorderColor;
+            dst.ButtonNormalColor = src.ButtonNormalColor;
+            dst.ButtonTextColor = src.ButtonTextColor;
+            dst.ButtonBorderColor = src.ButtonBorderColor;
+            dst.ProgressBackgroundColor = src.ProgressBackgroundColor;
+            dst.ProgressFillColor = src.ProgressFillColor;
+            dst.ProgressTextColor = src.ProgressTextColor;
         }
 
         private static void RaiseThemeChanged()

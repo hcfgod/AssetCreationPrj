@@ -268,6 +268,19 @@ namespace CustomAssets.EditorTools
             _instance.Show();
         }
 
+        /// <summary>
+        /// Override this to draw your window content. By default we wrap it in a scroll view.
+        /// </summary>
+        protected virtual void DrawWindowContents() { }
+
+        private void OnGUI()
+        {
+            ScrollView(() =>
+            {
+                try { DrawWindowContents(); } catch { }
+            });
+        }
+
         protected virtual void OnEnable()
         {
             _instance = (T)this;
@@ -329,7 +342,9 @@ namespace CustomAssets.EditorTools
         protected void Header(string label, EditorStyle style = EditorStyle.BoldLabel)
         {
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField(label, EditorStyleConverter.ToGUIStyle(style));
+            GUIStyle s = new GUIStyle(EditorStyleConverter.ToGUIStyle(style));
+            s.normal.textColor = CurrentTheme.HeaderTextColor;
+            EditorGUILayout.LabelField(label, s);
         }
 
         /// <summary>
@@ -414,18 +429,26 @@ namespace CustomAssets.EditorTools
             Rect r = GUILayoutUtility.GetRect(0, 20, GUILayout.ExpandWidth(true));
             if (Event.current.type == EventType.Repaint)
             {
-                EditorStyles.helpBox.Draw(r, GUIContent.none, false, false, false, false);
-                // top border accent
-                var border = new Rect(r.x, r.y, r.width, 1f);
-                EditorGUI.DrawRect(border, CurrentTheme.FooterBorderColor);
+                // Background
+                EditorGUI.DrawRect(r, CurrentTheme.PanelBackgroundColor);
+                // Top accent border
+                var top = new Rect(r.x, r.y, r.width, 1f);
+                EditorGUI.DrawRect(top, CurrentTheme.FooterBorderColor);
+                // Outer border
+                var borderColor = CurrentTheme.PanelBorderColor;
+                EditorGUI.DrawRect(new Rect(r.x, r.y, 1f, r.height), borderColor);
+                EditorGUI.DrawRect(new Rect(r.xMax - 1f, r.y, 1f, r.height), borderColor);
+                EditorGUI.DrawRect(new Rect(r.x, r.yMax - 1f, r.width, 1f), borderColor);
             }
             r.x += 6; r.width -= 12;
             var leftRect = new Rect(r.x, r.y, r.width * 0.6f, r.height);
             var rightRect = new Rect(r.x + r.width * 0.6f, r.y, r.width * 0.4f, r.height);
-            EditorGUI.LabelField(leftRect, left ?? string.Empty, EditorStyles.miniLabel);
+            var small = new GUIStyle(EditorStyles.miniLabel);
+            small.normal.textColor = CurrentTheme.SubTextColor;
+            EditorGUI.LabelField(leftRect, left ?? string.Empty, small);
             if (!string.IsNullOrEmpty(right))
             {
-                GUIStyle alignRight = new GUIStyle(EditorStyles.miniLabel) { alignment = TextAnchor.MiddleRight };
+                GUIStyle alignRight = new GUIStyle(small) { alignment = TextAnchor.MiddleRight };
                 EditorGUI.LabelField(rightRect, right, alignRight);
             }
         }
@@ -521,9 +544,9 @@ namespace CustomAssets.EditorTools
 
             if (Event.current.type == EventType.Repaint)
             {
-                EditorGUI.DrawRect(rect, CurrentTheme.BackgroundColor);
+                EditorGUI.DrawRect(rect, CurrentTheme.ProgressBackgroundColor);
                 Rect fillRect = new Rect(rect.x + 1, rect.y + 1, (rect.width - 2) * progress, rect.height - 2);
-                EditorGUI.DrawRect(fillRect, CurrentTheme.AccentColor);
+                EditorGUI.DrawRect(fillRect, CurrentTheme.ProgressFillColor);
             }
 
             string displayText = label ?? string.Empty;
@@ -535,7 +558,9 @@ namespace CustomAssets.EditorTools
 
             if (!string.IsNullOrEmpty(displayText))
             {
-                GUI.Label(rect, displayText, EditorStyles.centeredGreyMiniLabel);
+                var style = new GUIStyle(EditorStyles.centeredGreyMiniLabel);
+                style.normal.textColor = CurrentTheme.ProgressTextColor;
+                GUI.Label(rect, displayText, style);
             }
         }
 
@@ -554,7 +579,14 @@ namespace CustomAssets.EditorTools
                 // Subtle border/background
                 if (Event.current.type == EventType.Repaint)
                 {
-                    EditorStyles.helpBox.Draw(outer, GUIContent.none, false, false, false, false);
+                    // Background
+                    EditorGUI.DrawRect(outer, CurrentTheme.PanelBackgroundColor);
+                    // Border
+                    var bc = CurrentTheme.PanelBorderColor;
+                    EditorGUI.DrawRect(new Rect(outer.x, outer.y, outer.width, 1f), bc);
+                    EditorGUI.DrawRect(new Rect(outer.x, outer.yMax - 1f, outer.width, 1f), bc);
+                    EditorGUI.DrawRect(new Rect(outer.x, outer.y, 1f, outer.height), bc);
+                    EditorGUI.DrawRect(new Rect(outer.xMax - 1f, outer.y, 1f, outer.height), bc);
                 }
                 Rect rect = new Rect(outer.x + 2, outer.y + 2, outer.width - 4, outer.height - 4);
 
@@ -607,7 +639,9 @@ namespace CustomAssets.EditorTools
 
                 if (!string.IsNullOrEmpty(label))
                 {
-                    EditorGUILayout.LabelField(label, EditorStyles.centeredGreyMiniLabel, GUILayout.Width(size));
+                    var ls = new GUIStyle(EditorStyles.centeredGreyMiniLabel);
+                    ls.normal.textColor = CurrentTheme.SubTextColor;
+                    EditorGUILayout.LabelField(label, ls, GUILayout.Width(size));
                 }
             });
 
@@ -773,6 +807,7 @@ namespace CustomAssets.EditorTools
             {
                 style.fontSize = fontSize;
             }
+            style.normal.textColor = bold ? CurrentTheme.HeaderTextColor : CurrentTheme.TextColor;
 
             EditorGUILayout.LabelField(text, style);
         }
@@ -993,16 +1028,21 @@ namespace CustomAssets.EditorTools
             Color originalBg = GUI.backgroundColor;
             Color originalText = GUI.contentColor;
             
-            if (backgroundColor.HasValue)
-                GUI.backgroundColor = backgroundColor.Value;
-            if (textColor.HasValue)
-                GUI.contentColor = textColor.Value;
+            GUI.backgroundColor = backgroundColor ?? CurrentTheme.ButtonNormalColor;
+            GUI.contentColor = textColor ?? CurrentTheme.ButtonTextColor;
             
             GUIStyle guiStyle = style == EditorStyle.Default ? GUIStyle.none : EditorStyleConverter.ToGUIStyle(style);
             bool clicked = GUILayout.Button(text, guiStyle, LayoutOptionConverter.ToGUILayoutOptions(options));
             
             GUI.backgroundColor = originalBg;
             GUI.contentColor = originalText;
+            // Border
+            Rect br = GUILayoutUtility.GetLastRect();
+            var borderColor = CurrentTheme.ButtonBorderColor;
+            EditorGUI.DrawRect(new Rect(br.x, br.y, br.width, 1f), borderColor);
+            EditorGUI.DrawRect(new Rect(br.x, br.yMax - 1f, br.width, 1f), borderColor);
+            EditorGUI.DrawRect(new Rect(br.x, br.y, 1f, br.height), borderColor);
+            EditorGUI.DrawRect(new Rect(br.xMax - 1f, br.y, 1f, br.height), borderColor);
             
             return clicked;
         }
@@ -1012,7 +1052,7 @@ namespace CustomAssets.EditorTools
         /// </summary>
         protected bool AccentButton(string text, EditorStyle style = EditorStyle.Default, params LayoutOption[] options)
         {
-            return Button(text, CurrentTheme.AccentColor, Color.white, style, options);
+            return Button(text, CurrentTheme.AccentColor, CurrentTheme.TextColor, style, options);
         }
 
         /// <summary>
@@ -1020,7 +1060,7 @@ namespace CustomAssets.EditorTools
         /// </summary>
         protected bool ColoredButton(string text, Color backgroundColor, EditorStyle style = EditorStyle.Default, params LayoutOption[] options)
         {
-            return Button(text, backgroundColor, Color.white, style, options);
+            return Button(text, backgroundColor, CurrentTheme.TextColor, style, options);
         }
 
         /// <summary>

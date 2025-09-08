@@ -13,6 +13,22 @@ namespace CustomAssets.EditorTools
         public Color FooterBorderColor = new Color(0f, 0f, 0f, 0.15f);
         public Color ToggleActiveColor = new Color(0.7f, 1f, 0.7f);
 
+        // Extended theming
+        public Color TextColor = new Color(0.85f, 0.85f, 0.85f);
+        public Color SubTextColor = new Color(0.7f, 0.7f, 0.7f);
+        public Color HeaderTextColor = new Color(0.95f, 0.95f, 0.95f);
+
+        public Color PanelBackgroundColor = new Color(0.18f, 0.18f, 0.18f);
+        public Color PanelBorderColor = new Color(0f, 0f, 0f, 0.35f);
+
+        public Color ButtonNormalColor = new Color(0.22f, 0.22f, 0.22f);
+        public Color ButtonTextColor = new Color(0.92f, 0.92f, 0.92f);
+        public Color ButtonBorderColor = new Color(0f, 0f, 0f, 0.45f);
+
+        public Color ProgressBackgroundColor = new Color(0.2f, 0.2f, 0.2f);
+        public Color ProgressFillColor = new Color(0.2f, 0.6f, 1f);
+        public Color ProgressTextColor = new Color(0.95f, 0.95f, 0.95f);
+
         public EditorTheme Clone()
         {
             return new EditorTheme
@@ -21,7 +37,18 @@ namespace CustomAssets.EditorTools
                 AccentColor = this.AccentColor,
                 SeparatorColor = this.SeparatorColor,
                 FooterBorderColor = this.FooterBorderColor,
-                ToggleActiveColor = this.ToggleActiveColor
+                ToggleActiveColor = this.ToggleActiveColor,
+                TextColor = this.TextColor,
+                SubTextColor = this.SubTextColor,
+                HeaderTextColor = this.HeaderTextColor,
+                PanelBackgroundColor = this.PanelBackgroundColor,
+                PanelBorderColor = this.PanelBorderColor,
+                ButtonNormalColor = this.ButtonNormalColor,
+                ButtonTextColor = this.ButtonTextColor,
+                ButtonBorderColor = this.ButtonBorderColor,
+                ProgressBackgroundColor = this.ProgressBackgroundColor,
+                ProgressFillColor = this.ProgressFillColor,
+                ProgressTextColor = this.ProgressTextColor
             };
         }
 
@@ -38,7 +65,18 @@ namespace CustomAssets.EditorTools
                 AccentColor = new Color(0.2f, 0.6f, 1f),
                 SeparatorColor = new Color(0.3f, 0.3f, 0.3f),
                 FooterBorderColor = new Color(0f, 0f, 0f, 0.15f),
-                ToggleActiveColor = new Color(0.7f, 1f, 0.7f)
+                ToggleActiveColor = new Color(0.7f, 1f, 0.7f),
+                TextColor = new Color(0.85f, 0.85f, 0.85f),
+                SubTextColor = new Color(0.7f, 0.7f, 0.7f),
+                HeaderTextColor = new Color(0.95f, 0.95f, 0.95f),
+                PanelBackgroundColor = new Color(0.18f, 0.18f, 0.18f),
+                PanelBorderColor = new Color(0f, 0f, 0f, 0.35f),
+                ButtonNormalColor = new Color(0.22f, 0.22f, 0.22f),
+                ButtonTextColor = new Color(0.92f, 0.92f, 0.92f),
+                ButtonBorderColor = new Color(0f, 0f, 0f, 0.45f),
+                ProgressBackgroundColor = new Color(0.2f, 0.2f, 0.2f),
+                ProgressFillColor = new Color(0.2f, 0.6f, 1f),
+                ProgressTextColor = new Color(0.95f, 0.95f, 0.95f)
             };
         }
 
@@ -50,7 +88,18 @@ namespace CustomAssets.EditorTools
                 AccentColor = new Color(0.24f, 0.5f, 0.9f),
                 SeparatorColor = new Color(0.75f, 0.75f, 0.75f),
                 FooterBorderColor = new Color(0f, 0f, 0f, 0.1f),
-                ToggleActiveColor = new Color(0.55f, 0.9f, 0.55f)
+                ToggleActiveColor = new Color(0.55f, 0.9f, 0.55f),
+                TextColor = new Color(0.1f, 0.1f, 0.1f),
+                SubTextColor = new Color(0.25f, 0.25f, 0.25f),
+                HeaderTextColor = new Color(0.05f, 0.05f, 0.05f),
+                PanelBackgroundColor = new Color(0.95f, 0.95f, 0.95f),
+                PanelBorderColor = new Color(0f, 0f, 0f, 0.2f),
+                ButtonNormalColor = new Color(0.92f, 0.92f, 0.92f),
+                ButtonTextColor = new Color(0.12f, 0.12f, 0.12f),
+                ButtonBorderColor = new Color(0f, 0f, 0f, 0.25f),
+                ProgressBackgroundColor = new Color(0.85f, 0.85f, 0.85f),
+                ProgressFillColor = new Color(0.24f, 0.5f, 0.9f),
+                ProgressTextColor = new Color(0.12f, 0.12f, 0.12f)
             };
         }
 
@@ -62,6 +111,17 @@ namespace CustomAssets.EditorTools
             baseTheme.SeparatorColor    = LoadColor(prefix + "sep", baseTheme.SeparatorColor);
             baseTheme.FooterBorderColor = LoadColor(prefix + "footer", baseTheme.FooterBorderColor);
             baseTheme.ToggleActiveColor = LoadColor(prefix + "toggle", baseTheme.ToggleActiveColor);
+            baseTheme.TextColor         = LoadColor(prefix + "text", baseTheme.TextColor);
+            baseTheme.SubTextColor      = LoadColor(prefix + "subtext", baseTheme.SubTextColor);
+            baseTheme.HeaderTextColor   = LoadColor(prefix + "headerText", baseTheme.HeaderTextColor);
+            baseTheme.PanelBackgroundColor = LoadColor(prefix + "panelBg", baseTheme.PanelBackgroundColor);
+            baseTheme.PanelBorderColor  = LoadColor(prefix + "panelBorder", baseTheme.PanelBorderColor);
+            baseTheme.ButtonNormalColor = LoadColor(prefix + "btnBg", baseTheme.ButtonNormalColor);
+            baseTheme.ButtonTextColor   = LoadColor(prefix + "btnText", baseTheme.ButtonTextColor);
+            baseTheme.ButtonBorderColor = LoadColor(prefix + "btnBorder", baseTheme.ButtonBorderColor);
+            baseTheme.ProgressBackgroundColor = LoadColor(prefix + "progBg", baseTheme.ProgressBackgroundColor);
+            baseTheme.ProgressFillColor = LoadColor(prefix + "progFill", baseTheme.ProgressFillColor);
+            baseTheme.ProgressTextColor = LoadColor(prefix + "progText", baseTheme.ProgressTextColor);
             return baseTheme;
         }
 
@@ -72,6 +132,17 @@ namespace CustomAssets.EditorTools
             SaveColor(prefix + "sep", SeparatorColor);
             SaveColor(prefix + "footer", FooterBorderColor);
             SaveColor(prefix + "toggle", ToggleActiveColor);
+            SaveColor(prefix + "text", TextColor);
+            SaveColor(prefix + "subtext", SubTextColor);
+            SaveColor(prefix + "headerText", HeaderTextColor);
+            SaveColor(prefix + "panelBg", PanelBackgroundColor);
+            SaveColor(prefix + "panelBorder", PanelBorderColor);
+            SaveColor(prefix + "btnBg", ButtonNormalColor);
+            SaveColor(prefix + "btnText", ButtonTextColor);
+            SaveColor(prefix + "btnBorder", ButtonBorderColor);
+            SaveColor(prefix + "progBg", ProgressBackgroundColor);
+            SaveColor(prefix + "progFill", ProgressFillColor);
+            SaveColor(prefix + "progText", ProgressTextColor);
         }
 
         public static void DeleteFromPrefs(string prefix)
@@ -81,6 +152,17 @@ namespace CustomAssets.EditorTools
             DeleteColor(prefix + "sep");
             DeleteColor(prefix + "footer");
             DeleteColor(prefix + "toggle");
+            DeleteColor(prefix + "text");
+            DeleteColor(prefix + "subtext");
+            DeleteColor(prefix + "headerText");
+            DeleteColor(prefix + "panelBg");
+            DeleteColor(prefix + "panelBorder");
+            DeleteColor(prefix + "btnBg");
+            DeleteColor(prefix + "btnText");
+            DeleteColor(prefix + "btnBorder");
+            DeleteColor(prefix + "progBg");
+            DeleteColor(prefix + "progFill");
+            DeleteColor(prefix + "progText");
         }
 
         private static Color LoadColor(string key, Color fallback)

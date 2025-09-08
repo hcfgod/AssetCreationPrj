@@ -23,7 +23,7 @@ public class ExampleWindow : KEditorWindow<ExampleWindow>
         ShowWindow("Example Window");
     }
 
-    private void OnGUI()
+    protected override void DrawWindowContents()
     {
         // Toolbar with search
         Toolbar(
@@ -380,6 +380,26 @@ public class ExampleWindow : KEditorWindow<ExampleWindow>
             theme.SeparatorColor    = ColorPicker("Separator", theme.SeparatorColor);
             theme.FooterBorderColor = ColorPicker("Footer Border", theme.FooterBorderColor);
             theme.ToggleActiveColor = ColorPicker("Toggle Active", theme.ToggleActiveColor);
+
+            EditorGUILayout.Space();
+            Header("Extended Colors", EditorStyle.BoldLabel);
+            theme.TextColor            = ColorPicker("Text", theme.TextColor);
+            theme.SubTextColor         = ColorPicker("Sub Text", theme.SubTextColor);
+            theme.HeaderTextColor      = ColorPicker("Header Text", theme.HeaderTextColor);
+            theme.PanelBackgroundColor = ColorPicker("Panel Background", theme.PanelBackgroundColor);
+            theme.PanelBorderColor     = ColorPicker("Panel Border", theme.PanelBorderColor);
+
+            EditorGUILayout.Space();
+            Header("Button Colors", EditorStyle.BoldLabel);
+            theme.ButtonNormalColor = ColorPicker("Button Background", theme.ButtonNormalColor);
+            theme.ButtonTextColor   = ColorPicker("Button Text", theme.ButtonTextColor);
+            theme.ButtonBorderColor = ColorPicker("Button Border", theme.ButtonBorderColor);
+
+            EditorGUILayout.Space();
+            Header("Progress Bar Colors", EditorStyle.BoldLabel);
+            theme.ProgressBackgroundColor = ColorPicker("Progress Background", theme.ProgressBackgroundColor);
+            theme.ProgressFillColor       = ColorPicker("Progress Fill", theme.ProgressFillColor);
+            theme.ProgressTextColor       = ColorPicker("Progress Text", theme.ProgressTextColor);
 
             EditorGUILayout.Space();
             Horizontal(() =>

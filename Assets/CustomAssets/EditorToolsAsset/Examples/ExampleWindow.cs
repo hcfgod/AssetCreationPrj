@@ -12,7 +12,7 @@ public class ExampleWindow : KEditorWindow<ExampleWindow>
     private float demoMin = 0f, demoMax = 10f;
     private bool demoToggle = false;
     private LayerMask demoLayerMask = 1;
-    private Texture2D demoTexture;
+    private Object demoAsset;
     private float progressValue = 0.3f;
     private int selectedGridItem = 0;
     private string[] gridOptions = { "Option 1", "Option 2", "Option 3", "Option 4" };
@@ -272,34 +272,47 @@ public class ExampleWindow : KEditorWindow<ExampleWindow>
             ProgressBar(progressValue, "Loading Assets", true);
             Horizontal(() =>
             {
-                EditorGUILayout.LabelField("Progress:", GUILayout.Width(60));
+                EditorGUILayout.LabelField("Progress:", GUILayout.Width(65));
                 progressValue = EditorGUILayout.Slider(progressValue, 0f, 1f);
             });
         });
 
         Foldout("preview", "Asset Preview", () =>
         {
-            if (demoTexture == null)
-            {
-                EditorGUILayout.LabelField("No texture selected");
-                if (GUILayout.Button("Load Default Texture"))
+            TwoColumns(
+                leftColumn: () =>
                 {
-                    demoTexture = Resources.Load<Texture2D>("unity_builtin_extra/Default-Checker");
-                }
-            }
-            else
-            {
-                if (AssetPreview(demoTexture, 64f, "Demo Texture"))
+                    EditorGUILayout.LabelField("Asset:");
+                    demoAsset = EditorGUILayout.ObjectField(demoAsset, typeof(Object), false);
+
+                    EditorGUILayout.Space();
+                    if (demoAsset != null)
+                    {
+                        EditorGUILayout.LabelField($"Name: {demoAsset.name}", EditorStyles.miniLabel);
+                        EditorGUILayout.LabelField($"Type: {demoAsset.GetType().Name}", EditorStyles.miniLabel);
+                        Horizontal(() =>
+                        {
+                            if (GUILayout.Button("Ping", GUILayout.Width(60))) EditorGUIUtility.PingObject(demoAsset);
+                            if (GUILayout.Button("Clear", GUILayout.Width(60))) demoAsset = null;
+                        });
+                    }
+                    else
+                    {
+                        EditorGUILayout.LabelField("Drag any asset here", EditorStyles.miniLabel);
+                    }
+                },
+                rightColumn: () =>
                 {
-                    EditorGUIUtility.PingObject(demoTexture);
-                }
-                
-                Horizontal(() =>
-                {
-                    EditorGUILayout.LabelField("Texture:", GUILayout.Width(60));
-                    demoTexture = ObjectField<Texture2D>("", demoTexture, false);
-                });
-            }
+                    if (demoAsset != null)
+                    {
+                        if (AssetPreview(demoAsset, 96f, demoAsset.name))
+                        {
+                            EditorGUIUtility.PingObject(demoAsset);
+                        }
+                    }
+                },
+                leftWidth: 260f
+            );
         });
 
         Foldout("messages", "Help Messages", () =>

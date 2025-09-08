@@ -541,6 +541,7 @@ namespace CustomAssets.EditorTools
 
         /// <summary>
         /// Draws an asset preview thumbnail with optional label. Returns true if clicked.
+        /// Supports textures, sprites, materials, prefabs and other assets with fallbacks.
         /// </summary>
         protected bool AssetPreview(Object asset, float size = 64f, string label = null)
         {
@@ -549,22 +550,59 @@ namespace CustomAssets.EditorTools
             bool clicked = false;
             Vertical(() =>
             {
-                Texture2D preview = UnityEditor.AssetPreview.GetAssetPreview(asset);
-                if (preview != null)
+                Rect outer = GUILayoutUtility.GetRect(size, size, GUILayout.Width(size), GUILayout.Height(size));
+                // Subtle border/background
+                if (Event.current.type == EventType.Repaint)
                 {
-                    Rect rect = GUILayoutUtility.GetRect(size, size, GUILayout.Width(size), GUILayout.Height(size));
-                    if (GUI.Button(rect, preview, GUIStyle.none))
-                    {
-                        clicked = true;
-                    }
+                    EditorStyles.helpBox.Draw(outer, GUIContent.none, false, false, false, false);
+                }
+                Rect rect = new Rect(outer.x + 2, outer.y + 2, outer.width - 4, outer.height - 4);
+
+                bool drew = false;
+
+                // 1) Sprite: draw the sprite region from its texture
+                if (asset is Sprite sprite)
+                {
+                    var tex = sprite.texture;
+                    var tr = sprite.textureRect;
+                    var uv = new Rect(tr.x / tex.width, tr.y / tex.height, tr.width / tex.width, tr.height / tex.height);
+                    GUI.DrawTextureWithTexCoords(rect, tex, uv, true);
+                    drew = true;
+                }
+                // 2) Texture: draw directly at high quality
+                else if (asset is Texture2D tex2D)
+                {
+                    GUI.DrawTexture(rect, tex2D, ScaleMode.ScaleToFit, true);
+                    drew = true;
                 }
                 else
                 {
-                    Rect rect = GUILayoutUtility.GetRect(size, size, GUILayout.Width(size), GUILayout.Height(size));
-                    if (GUI.Button(rect, "?", EditorStyles.miniButton))
+                    // 3) Ask Unity's preview system (works for materials, prefabs, models, etc.)
+                    Texture2D preview = UnityEditor.AssetPreview.GetAssetPreview(asset);
+                    if (preview == null)
+                        preview = UnityEditor.AssetPreview.GetMiniThumbnail(asset);
+
+                    if (preview != null)
                     {
-                        clicked = true;
+                        GUI.DrawTexture(rect, preview, ScaleMode.ScaleToFit, true);
+                        drew = true;
                     }
+
+                    // If Unity is still generating the preview, request a repaint
+                    if (UnityEditor.AssetPreview.IsLoadingAssetPreview(asset.GetInstanceID()))
+                    {
+                        try { Repaint(); } catch { }
+                    }
+                }
+
+                if (!drew)
+                {
+                    EditorGUI.LabelField(rect, "No Preview", EditorStyles.centeredGreyMiniLabel);
+                }
+
+                if (GUI.Button(rect, GUIContent.none, GUIStyle.none))
+                {
+                    clicked = true;
                 }
 
                 if (!string.IsNullOrEmpty(label))

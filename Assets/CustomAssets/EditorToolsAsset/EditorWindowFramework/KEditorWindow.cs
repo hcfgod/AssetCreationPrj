@@ -831,9 +831,17 @@ namespace CustomAssets.EditorTools
             GUI.backgroundColor = CurrentTheme.ButtonNormalColor;
             GUI.contentColor = CurrentTheme.ButtonTextColor;
             GUIContent content = new GUIContent(text, condition ? null : disabledTooltip);
-            bool clicked = GUILayout.Button(content, EditorStyleConverter.ToGUIStyle(EditorStyle.Button));
-            // Border
+            GUIStyle buttonStyle = EditorStyleConverter.ToGUIStyle(EditorStyle.Button);
+            bool clicked = GUILayout.Button(content, buttonStyle);
+            // Border (account for style margins so border hugs the visual button)
             Rect br = GUILayoutUtility.GetLastRect();
+            if (buttonStyle != null)
+            {
+                br.x += buttonStyle.margin.left;
+                br.y += buttonStyle.margin.top;
+                br.width -= buttonStyle.margin.horizontal;
+                br.height -= buttonStyle.margin.vertical;
+            }
             var borderColor = CurrentTheme.ButtonBorderColor;
             EditorGUI.DrawRect(new Rect(br.x, br.y, br.width, 1f), borderColor);
             EditorGUI.DrawRect(new Rect(br.x, br.yMax - 1f, br.width, 1f), borderColor);
@@ -872,8 +880,15 @@ namespace CustomAssets.EditorTools
             GUI.contentColor = CurrentTheme.ButtonTextColor;
             GUIStyle guiStyle = style == EditorStyle.Default ? GUIStyle.none : EditorStyleConverter.ToGUIStyle(style);
             bool clicked = GUILayout.Button(text, guiStyle, LayoutOptionConverter.ToGUILayoutOptions(options));
-            // Border
+            // Border (account for style margins so border hugs the visual button)
             Rect br = GUILayoutUtility.GetLastRect();
+            if (guiStyle != null)
+            {
+                br.x += guiStyle.margin.left;
+                br.y += guiStyle.margin.top;
+                br.width -= guiStyle.margin.horizontal;
+                br.height -= guiStyle.margin.vertical;
+            }
             var borderColor = CurrentTheme.ButtonBorderColor;
             EditorGUI.DrawRect(new Rect(br.x, br.y, br.width, 1f), borderColor);
             EditorGUI.DrawRect(new Rect(br.x, br.yMax - 1f, br.width, 1f), borderColor);

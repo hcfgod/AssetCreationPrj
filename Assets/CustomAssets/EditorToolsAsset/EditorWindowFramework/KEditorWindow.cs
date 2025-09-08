@@ -4,6 +4,186 @@ using UnityEditor;
 
 namespace CustomAssets.EditorTools
 {
+    /// <summary>
+    /// Custom layout options that map to Unity's GUILayoutOption system.
+    /// </summary>
+    public enum LayoutOption
+    {
+        None,
+        ExpandWidth,
+        ExpandHeight,
+        Width50,
+        Width60,
+        Width80,
+        Width100,
+        Width120,
+        Width150,
+        Width200,
+        Height18,
+        Height20,
+        Height24,
+        Height30,
+        Height40,
+        Height50,
+        MinWidth50,
+        MinWidth100,
+        MinWidth120,
+        MaxWidth200,
+        MaxWidth300,
+        MaxWidth400
+    }
+
+    /// <summary>
+    /// Helper class to convert custom layout options to Unity's GUILayoutOption array.
+    /// </summary>
+    public static class LayoutOptionConverter
+    {
+        public static GUILayoutOption[] ToGUILayoutOptions(params LayoutOption[] options)
+        {
+            if (options == null || options.Length == 0) return null;
+            
+            var result = new System.Collections.Generic.List<GUILayoutOption>();
+            
+            foreach (var option in options)
+            {
+                switch (option)
+                {
+                    case LayoutOption.ExpandWidth:
+                        result.Add(GUILayout.ExpandWidth(true));
+                        break;
+                    case LayoutOption.ExpandHeight:
+                        result.Add(GUILayout.ExpandHeight(true));
+                        break;
+                    case LayoutOption.Width50:
+                        result.Add(GUILayout.Width(50));
+                        break;
+                    case LayoutOption.Width60:
+                        result.Add(GUILayout.Width(60));
+                        break;
+                    case LayoutOption.Width80:
+                        result.Add(GUILayout.Width(80));
+                        break;
+                    case LayoutOption.Width100:
+                        result.Add(GUILayout.Width(100));
+                        break;
+                    case LayoutOption.Width120:
+                        result.Add(GUILayout.Width(120));
+                        break;
+                    case LayoutOption.Width150:
+                        result.Add(GUILayout.Width(150));
+                        break;
+                    case LayoutOption.Width200:
+                        result.Add(GUILayout.Width(200));
+                        break;
+                    case LayoutOption.Height18:
+                        result.Add(GUILayout.Height(18));
+                        break;
+                    case LayoutOption.Height20:
+                        result.Add(GUILayout.Height(20));
+                        break;
+                    case LayoutOption.Height24:
+                        result.Add(GUILayout.Height(24));
+                        break;
+                    case LayoutOption.Height30:
+                        result.Add(GUILayout.Height(30));
+                        break;
+                    case LayoutOption.Height40:
+                        result.Add(GUILayout.Height(40));
+                        break;
+                    case LayoutOption.Height50:
+                        result.Add(GUILayout.Height(50));
+                        break;
+                    case LayoutOption.MinWidth50:
+                        result.Add(GUILayout.MinWidth(50));
+                        break;
+                    case LayoutOption.MinWidth100:
+                        result.Add(GUILayout.MinWidth(100));
+                        break;
+                    case LayoutOption.MinWidth120:
+                        result.Add(GUILayout.MinWidth(120));
+                        break;
+                    case LayoutOption.MaxWidth200:
+                        result.Add(GUILayout.MaxWidth(200));
+                        break;
+                    case LayoutOption.MaxWidth300:
+                        result.Add(GUILayout.MaxWidth(300));
+                        break;
+                    case LayoutOption.MaxWidth400:
+                        result.Add(GUILayout.MaxWidth(400));
+                        break;
+                }
+            }
+            
+            return result.ToArray();
+        }
+    }
+
+    /// <summary>
+    /// Custom editor styles that map to Unity's EditorStyles system.
+    /// </summary>
+    public enum EditorStyle
+    {
+        Default,
+        Button,
+        MiniButton,
+        ToolbarButton,
+        ToolbarSearchField,
+        BoldLabel,
+        Label,
+        MiniLabel,
+        CenteredGreyMiniLabel,
+        HelpBox,
+        TextField,
+        TextArea,
+        Popup,
+        Foldout,
+        Toggle,
+        ColorField,
+        ObjectField,
+        LayerMaskField,
+        FoldoutHeader,
+        Toolbar,
+        ToolbarDropDown,
+        ToolbarPopup,
+        ToolbarTextField
+    }
+
+    /// <summary>
+    /// Helper class to convert custom editor styles to Unity's GUIStyle.
+    /// </summary>
+    public static class EditorStyleConverter
+    {
+        public static GUIStyle ToGUIStyle(EditorStyle style)
+        {
+            switch (style)
+            {
+                case EditorStyle.Button: return EditorStyles.miniButton;
+                case EditorStyle.MiniButton: return EditorStyles.miniButton;
+                case EditorStyle.ToolbarButton: return EditorStyles.toolbarButton;
+                case EditorStyle.ToolbarSearchField: return EditorStyles.toolbarSearchField;
+                case EditorStyle.BoldLabel: return EditorStyles.boldLabel;
+                case EditorStyle.Label: return EditorStyles.label;
+                case EditorStyle.MiniLabel: return EditorStyles.miniLabel;
+                case EditorStyle.CenteredGreyMiniLabel: return EditorStyles.centeredGreyMiniLabel;
+                case EditorStyle.HelpBox: return EditorStyles.helpBox;
+                case EditorStyle.TextField: return EditorStyles.textField;
+                case EditorStyle.TextArea: return EditorStyles.textArea;
+                case EditorStyle.Popup: return EditorStyles.popup;
+                case EditorStyle.Foldout: return EditorStyles.foldout;
+                case EditorStyle.Toggle: return EditorStyles.toggle;
+                case EditorStyle.ColorField: return EditorStyles.colorField;
+                case EditorStyle.ObjectField: return EditorStyles.objectField;
+                case EditorStyle.LayerMaskField: return EditorStyles.layerMaskField;
+                case EditorStyle.FoldoutHeader: return EditorStyles.foldoutHeader;
+                case EditorStyle.Toolbar: return EditorStyles.toolbar;
+                case EditorStyle.ToolbarDropDown: return EditorStyles.toolbarDropDown;
+                case EditorStyle.ToolbarPopup: return EditorStyles.toolbarPopup;
+                case EditorStyle.ToolbarTextField: return EditorStyles.toolbarTextField;
+                default: return GUIStyle.none;
+            }
+        }
+    }
+
     public abstract class KEditorWindow<T> : EditorWindow where T : KEditorWindow<T>
     {
         private static T _instance;
@@ -193,10 +373,10 @@ namespace CustomAssets.EditorTools
             EditorGUILayout.EndScrollView();
         }
 
-        protected void Header(string label)
+        protected void Header(string label, EditorStyle style = EditorStyle.BoldLabel)
         {
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField(label, EditorStyles.boldLabel);
+            EditorGUILayout.LabelField(label, EditorStyleConverter.ToGUIStyle(style));
         }
 
         /// <summary>
@@ -300,9 +480,9 @@ namespace CustomAssets.EditorTools
         /// <summary>
         /// Horizontal group helper.
         /// </summary>
-        protected void Horizontal(System.Action content)
+        protected void Horizontal(System.Action content, params LayoutOption[] options)
         {
-            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.BeginHorizontal(LayoutOptionConverter.ToGUILayoutOptions(options));
             content?.Invoke();
             EditorGUILayout.EndHorizontal();
         }
@@ -310,9 +490,9 @@ namespace CustomAssets.EditorTools
         /// <summary>
         /// Vertical group helper.
         /// </summary>
-        protected void Vertical(System.Action content)
+        protected void Vertical(System.Action content, params LayoutOption[] options)
         {
-            EditorGUILayout.BeginVertical();
+            EditorGUILayout.BeginVertical(LayoutOptionConverter.ToGUILayoutOptions(options));
             content?.Invoke();
             EditorGUILayout.EndVertical();
         }
@@ -446,9 +626,10 @@ namespace CustomAssets.EditorTools
         /// <summary>
         /// Creates a foldout group that persists its state in EditorPrefs.
         /// </summary>
-        protected bool Foldout(string key, string label, System.Action content, bool defaultExpanded = false)
+        protected bool Foldout(string key, string label, System.Action content, bool defaultExpanded = false, EditorStyle style = EditorStyle.Foldout)
         {
             bool expanded = EditorPrefs.GetBool(GetPrefsKey($"foldout.{key}"), defaultExpanded);
+            // EditorGUILayout.Foldout does not accept a GUIStyle in newer Unity versions
             bool newExpanded = EditorGUILayout.Foldout(expanded, label, true);
 
             if (newExpanded != expanded)
@@ -564,9 +745,9 @@ namespace CustomAssets.EditorTools
         }
 
         /// <summary>
-        /// Enhanced object field with drag-and-drop highlight.
+        /// Enhanced object field with drag-and-drop highlight and customizable styling.
         /// </summary>
-        protected TObject ObjectField<TObject>(string label, TObject obj, bool allowSceneObjects = true) where TObject : Object
+        protected TObject ObjectField<TObject>(string label, TObject obj, bool allowSceneObjects = true, EditorStyle style = EditorStyle.ObjectField) where TObject : Object
         {
             return EditorGUILayout.ObjectField(label, obj, typeof(TObject), allowSceneObjects) as TObject;
         }
@@ -621,9 +802,25 @@ namespace CustomAssets.EditorTools
         }
 
         /// <summary>
+        /// Creates a toggle with customizable styling.
+        /// </summary>
+        protected bool Toggle(string label, bool value, EditorStyle style = EditorStyle.Toggle)
+        {
+            return EditorGUILayout.Toggle(label, value);
+        }
+
+        /// <summary>
+        /// Creates a toggle without label with customizable styling.
+        /// </summary>
+        protected bool Toggle(bool value, EditorStyle style = EditorStyle.Toggle)
+        {
+            return EditorGUILayout.Toggle(value);
+        }
+
+        /// <summary>
         /// Creates a toggle button that shows its state visually.
         /// </summary>
-        protected bool ToggleButton(string text, bool value)
+        protected bool ToggleButton(string text, bool value, EditorStyle style = EditorStyle.Button, params LayoutOption[] options)
         {
             Color originalColor = GUI.backgroundColor;
             if (value)
@@ -631,10 +828,51 @@ namespace CustomAssets.EditorTools
                 GUI.backgroundColor = CurrentTheme.ToggleActiveColor;
             }
 
-            bool clicked = GUILayout.Button(text);
+            GUIStyle guiStyle = style == EditorStyle.Default ? GUIStyle.none : EditorStyleConverter.ToGUIStyle(style);
+            bool clicked = GUILayout.Button(text, guiStyle, LayoutOptionConverter.ToGUILayoutOptions(options));
             GUI.backgroundColor = originalColor;
 
             return clicked ? !value : value;
+        }
+
+        /// <summary>
+        /// Creates a text field with customizable styling.
+        /// </summary>
+        protected string TextField(string label, string value, EditorStyle style = EditorStyle.TextField)
+        {
+            return EditorGUILayout.TextField(label, value);
+        }
+
+        /// <summary>
+        /// Creates a text field without label with customizable styling.
+        /// </summary>
+        protected string TextField(string value, EditorStyle style = EditorStyle.TextField)
+        {
+            return EditorGUILayout.TextField(value);
+        }
+
+        /// <summary>
+        /// Creates a text area with customizable styling.
+        /// </summary>
+        protected string TextArea(string value, EditorStyle style = EditorStyle.TextArea, params GUILayoutOption[] options)
+        {
+            return EditorGUILayout.TextArea(value, options);
+        }
+
+        /// <summary>
+        /// Creates a password field with customizable styling.
+        /// </summary>
+        protected string PasswordField(string label, string value, EditorStyle style = EditorStyle.TextField)
+        {
+            return EditorGUILayout.PasswordField(label, value);
+        }
+
+        /// <summary>
+        /// Creates a password field without label with customizable styling.
+        /// </summary>
+        protected string PasswordField(string value, EditorStyle style = EditorStyle.TextField)
+        {
+            return EditorGUILayout.PasswordField(value);
         }
 
         /// <summary>
@@ -654,17 +892,81 @@ namespace CustomAssets.EditorTools
         }
 
         /// <summary>
-        /// Creates a simple enum popup.
+        /// Creates a simple enum popup with customizable styling.
         /// </summary>
-        protected TEnum EnumPopup<TEnum>(string label, TEnum value) where TEnum : System.Enum
+        protected TEnum EnumPopup<TEnum>(string label, TEnum value, EditorStyle style = EditorStyle.Popup) where TEnum : System.Enum
         {
             return (TEnum)EditorGUILayout.EnumPopup(label, value);
         }
 
         /// <summary>
-        /// Creates a simple mask field for LayerMask.
+        /// Creates a float field with customizable styling.
         /// </summary>
-        protected LayerMask LayerMaskField(string label, LayerMask layerMask)
+        protected float FloatField(string label, float value, EditorStyle style = EditorStyle.TextField)
+        {
+            return EditorGUILayout.FloatField(label, value);
+        }
+
+        /// <summary>
+        /// Creates a float field without label with customizable styling.
+        /// </summary>
+        protected float FloatField(float value, EditorStyle style = EditorStyle.TextField)
+        {
+            return EditorGUILayout.FloatField(value);
+        }
+
+        /// <summary>
+        /// Creates an integer field with customizable styling.
+        /// </summary>
+        protected int IntField(string label, int value, EditorStyle style = EditorStyle.TextField)
+        {
+            return EditorGUILayout.IntField(label, value);
+        }
+
+        /// <summary>
+        /// Creates an integer field without label with customizable styling.
+        /// </summary>
+        protected int IntField(int value, EditorStyle style = EditorStyle.TextField)
+        {
+            return EditorGUILayout.IntField(value);
+        }
+
+        /// <summary>
+        /// Creates a slider for float values with customizable styling.
+        /// </summary>
+        protected float Slider(string label, float value, float leftValue, float rightValue, EditorStyle style = EditorStyle.Label)
+        {
+            return EditorGUILayout.Slider(label, value, leftValue, rightValue);
+        }
+
+        /// <summary>
+        /// Creates a slider for integer values with customizable styling.
+        /// </summary>
+        protected int IntSlider(string label, int value, int leftValue, int rightValue, EditorStyle style = EditorStyle.Label)
+        {
+            return EditorGUILayout.IntSlider(label, value, leftValue, rightValue);
+        }
+
+        /// <summary>
+        /// Creates a color field with customizable styling.
+        /// </summary>
+        protected Color ColorField(string label, Color value, EditorStyle style = EditorStyle.ColorField)
+        {
+            return EditorGUILayout.ColorField(label, value);
+        }
+
+        /// <summary>
+        /// Creates a color field without label with customizable styling.
+        /// </summary>
+        protected Color ColorField(Color value, EditorStyle style = EditorStyle.ColorField)
+        {
+            return EditorGUILayout.ColorField(value);
+        }
+
+        /// <summary>
+        /// Creates a simple mask field for LayerMask with customizable styling.
+        /// </summary>
+        protected LayerMask LayerMaskField(string label, LayerMask layerMask, EditorStyle style = EditorStyle.LayerMaskField)
         {
             return EditorGUILayout.MaskField(label, layerMask, UnityEditorInternal.InternalEditorUtility.layers);
         }
@@ -695,7 +997,7 @@ namespace CustomAssets.EditorTools
         /// <summary>
         /// Creates a button with customizable colors and styling.
         /// </summary>
-        protected bool Button(string text, Color? backgroundColor = null, Color? textColor = null)
+        protected bool Button(string text, Color? backgroundColor = null, Color? textColor = null, EditorStyle style = EditorStyle.Default, params LayoutOption[] options)
         {
             Color originalBg = GUI.backgroundColor;
             Color originalText = GUI.contentColor;
@@ -705,7 +1007,8 @@ namespace CustomAssets.EditorTools
             if (textColor.HasValue)
                 GUI.contentColor = textColor.Value;
             
-            bool clicked = GUILayout.Button(text);
+            GUIStyle guiStyle = style == EditorStyle.Default ? GUIStyle.none : EditorStyleConverter.ToGUIStyle(style);
+            bool clicked = GUILayout.Button(text, guiStyle, LayoutOptionConverter.ToGUILayoutOptions(options));
             
             GUI.backgroundColor = originalBg;
             GUI.contentColor = originalText;
@@ -716,23 +1019,23 @@ namespace CustomAssets.EditorTools
         /// <summary>
         /// Creates a themed button using accent color as background.
         /// </summary>
-        protected bool AccentButton(string text)
+        protected bool AccentButton(string text, EditorStyle style = EditorStyle.Default, params LayoutOption[] options)
         {
-            return Button(text, CurrentTheme.AccentColor, Color.white);
+            return Button(text, CurrentTheme.AccentColor, Color.white, style, options);
         }
 
         /// <summary>
         /// Creates a button with custom background color and white text.
         /// </summary>
-        protected bool ColoredButton(string text, Color backgroundColor)
+        protected bool ColoredButton(string text, Color backgroundColor, EditorStyle style = EditorStyle.Default, params LayoutOption[] options)
         {
-            return Button(text, backgroundColor, Color.white);
+            return Button(text, backgroundColor, Color.white, style, options);
         }
 
         /// <summary>
         /// Creates a button with icon and customizable colors.
         /// </summary>
-        protected bool IconButton(string text, string iconName, Color? backgroundColor = null, Color? textColor = null)
+        protected bool IconButton(string text, string iconName, Color? backgroundColor = null, Color? textColor = null, EditorStyle style = EditorStyle.Default, params LayoutOption[] options)
         {
             Texture2D icon = EditorGUIUtility.IconContent(iconName).image as Texture2D;
             GUIContent content = new GUIContent(text, icon);
@@ -745,7 +1048,8 @@ namespace CustomAssets.EditorTools
             if (textColor.HasValue)
                 GUI.contentColor = textColor.Value;
             
-            bool clicked = GUILayout.Button(content);
+            GUIStyle guiStyle = style == EditorStyle.Default ? GUIStyle.none : EditorStyleConverter.ToGUIStyle(style);
+            bool clicked = GUILayout.Button(content, guiStyle, LayoutOptionConverter.ToGUILayoutOptions(options));
             
             GUI.backgroundColor = originalBg;
             GUI.contentColor = originalText;
@@ -756,9 +1060,9 @@ namespace CustomAssets.EditorTools
         /// <summary>
         /// Creates a themed icon button using accent color.
         /// </summary>
-        protected bool AccentIconButton(string text, string iconName)
+        protected bool AccentIconButton(string text, string iconName, EditorStyle style = EditorStyle.Default, params LayoutOption[] options)
         {
-            return IconButton(text, iconName, CurrentTheme.AccentColor, Color.white);
+            return IconButton(text, iconName, CurrentTheme.AccentColor, Color.white, style, options);
         }
         
         // =============== Hooks management ===============

@@ -29,14 +29,14 @@ public class ExampleWindow : KEditorWindow<ExampleWindow>
         Toolbar(
             drawLeft: () =>
             {
-                if (GUILayout.Button("Refresh", EditorStyles.toolbarButton))
+                if (Button("Refresh", style: EditorStyle.ToolbarButton))
                 {
                     Repaint();
                 }
             },
             drawRight: () =>
             {
-                if (GUILayout.Button("Help", EditorStyles.toolbarButton))
+                if (Button("Help", style: EditorStyle.ToolbarButton))
                 {
                     EditorUtility.DisplayDialog("Help", "This showcases all the new KEditorWindow IMGUI helpers!", "OK");
                 }
@@ -89,17 +89,17 @@ public class ExampleWindow : KEditorWindow<ExampleWindow>
             
             Horizontal(() =>
             {
-                if (AccentButton("Accent Button"))
+                if (AccentButton("Accent Button", EditorStyle.Button, LayoutOption.Width100))
                 {
                     Debug.Log("Accent button clicked!");
                 }
                 
-                if (ColoredButton("Red Button", Color.red))
+                if (ColoredButton("Red Button", Color.red, EditorStyle.MiniButton, LayoutOption.Width80))
                 {
                     Debug.Log("Red button clicked!");
                 }
                 
-                if (ColoredButton("Green Button", Color.green))
+                if (ColoredButton("Green Button", Color.green, EditorStyle.ToolbarButton, LayoutOption.Width80))
                 {
                     Debug.Log("Green button clicked!");
                 }
@@ -109,12 +109,12 @@ public class ExampleWindow : KEditorWindow<ExampleWindow>
             
             Horizontal(() =>
             {
-                if (AccentIconButton("Refresh", "Refresh"))
+                if (AccentIconButton("Refresh", "Refresh", EditorStyle.ToolbarButton, LayoutOption.Width120))
                 {
                     Debug.Log("Refresh icon button clicked!");
                 }
                 
-                if (IconButton("Help", "Help", Color.blue, Color.white))
+                if (IconButton("Help", "Help", Color.blue, Color.white, EditorStyle.MiniButton, LayoutOption.Width100))
                 {
                     Debug.Log("Help icon button clicked!");
                 }
@@ -187,6 +187,66 @@ public class ExampleWindow : KEditorWindow<ExampleWindow>
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Custom colored separator:");
             Separator(2f, null, Color.red);
+        });
+        
+        Foldout("layout_options", "Layout Options Examples", () =>
+        {
+            EditorGUILayout.LabelField("Different button sizes:");
+            
+            Horizontal(() =>
+            {
+                if (Button("Small", null, null, EditorStyle.Default, LayoutOption.Width60)) { }
+                if (Button("Medium", null, null, EditorStyle.Default, LayoutOption.Width100)) { }
+                if (Button("Large", null, null, EditorStyle.Default, LayoutOption.Width150)) { }
+            });
+            
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Fixed height buttons:");
+            
+            Horizontal(() =>
+            {
+                if (Button("Tall", null, null, EditorStyle.Default, LayoutOption.Height30)) { }
+                if (Button("Short", null, null, EditorStyle.Default, LayoutOption.Height18)) { }
+            });
+            
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Min/Max width constraints:");
+            
+            Horizontal(() =>
+            {
+                if (Button("Min 100px", null, null, EditorStyle.Default, LayoutOption.MinWidth100)) { }
+                if (Button("Max 200px", null, null, EditorStyle.Default, LayoutOption.MaxWidth200)) { }
+            });
+        });
+        
+        Foldout("editor_styles", "Editor Style Examples", () =>
+        {
+            EditorGUILayout.LabelField("Different button styles:");
+            
+            Horizontal(() =>
+            {
+                if (Button("Default", null, null, EditorStyle.Default, LayoutOption.Width80)) { }
+                if (Button("Button", null, null, EditorStyle.Button, LayoutOption.Width80)) { }
+                if (Button("Mini", null, null, EditorStyle.MiniButton, LayoutOption.Width80)) { }
+            });
+            
+            EditorGUILayout.Space();
+            
+            Horizontal(() =>
+            {
+                if (Button("Toolbar", null, null, EditorStyle.ToolbarButton, LayoutOption.Width80)) { }
+                if (Button("Popup", null, null, EditorStyle.Popup, LayoutOption.Width80)) { }
+                if (Button("Dropdown", null, null, EditorStyle.Popup, LayoutOption.Width80)) { }
+            });
+            
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Toggle button with different styles:");
+            
+            Horizontal(() =>
+            {
+                demoToggle = ToggleButton("Default Toggle", demoToggle, EditorStyle.Default, LayoutOption.Width100);
+                demoToggle = ToggleButton("Button Toggle", demoToggle, EditorStyle.Button, LayoutOption.Width100);
+            });
         });
     }
 

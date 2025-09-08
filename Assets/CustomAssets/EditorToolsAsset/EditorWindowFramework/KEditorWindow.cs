@@ -20,6 +20,71 @@ namespace CustomAssets.EditorTools
         // Hooks
         private bool _selectionHookActive;
 
+        // Theming
+        protected class Theme
+        {
+            public Color BackgroundColor = new Color(0.13f, 0.13f, 0.13f);
+            public Color AccentColor = new Color(0.2f, 0.6f, 1f);
+            public Color SeparatorColor = new Color(0.3f, 0.3f, 0.3f);
+            public Color FooterBorderColor = new Color(0f, 0f, 0f, 0.15f);
+            public Color ToggleActiveColor = new Color(0.7f, 1f, 0.7f);
+        }
+
+        private Theme _theme;
+        protected Theme CurrentTheme => _theme ??= LoadTheme();
+        
+        protected virtual Theme LoadTheme()
+        {
+            Theme t = new Theme();
+            try
+            {
+                string prefix = GetPrefsKey("theme.");
+                t.BackgroundColor = LoadColor(prefix + "bg", t.BackgroundColor);
+                t.AccentColor = LoadColor(prefix + "accent", t.AccentColor);
+                t.SeparatorColor = LoadColor(prefix + "sep", t.SeparatorColor);
+                t.FooterBorderColor = LoadColor(prefix + "footer", t.FooterBorderColor);
+                t.ToggleActiveColor = LoadColor(prefix + "toggle", t.ToggleActiveColor);
+            }
+            catch { }
+            return t;
+        }
+
+        protected void SaveTheme()
+        {
+            if (_theme == null) return;
+            try
+            {
+                string prefix = GetPrefsKey("theme.");
+                SaveColor(prefix + "bg", _theme.BackgroundColor);
+                SaveColor(prefix + "accent", _theme.AccentColor);
+                SaveColor(prefix + "sep", _theme.SeparatorColor);
+                SaveColor(prefix + "footer", _theme.FooterBorderColor);
+                SaveColor(prefix + "toggle", _theme.ToggleActiveColor);
+            }
+            catch { }
+        }
+
+        private static Color LoadColor(string key, Color fallback)
+        {
+            Color c = fallback;
+            if (EditorPrefs.HasKey(key + ".r"))
+            {
+                c.r = EditorPrefs.GetFloat(key + ".r", c.r);
+                c.g = EditorPrefs.GetFloat(key + ".g", c.g);
+                c.b = EditorPrefs.GetFloat(key + ".b", c.b);
+                c.a = EditorPrefs.GetFloat(key + ".a", c.a);
+            }
+            return c;
+        }
+
+        private static void SaveColor(string key, Color c)
+        {
+            EditorPrefs.SetFloat(key + ".r", c.r);
+            EditorPrefs.SetFloat(key + ".g", c.g);
+            EditorPrefs.SetFloat(key + ".b", c.b);
+            EditorPrefs.SetFloat(key + ".a", c.a);
+        }
+
         public static T Instance
         {
             get
@@ -134,10 +199,18 @@ namespace CustomAssets.EditorTools
             EditorGUILayout.LabelField(label, EditorStyles.boldLabel);
         }
 
-        protected void Separator()
+        /// <summary>
+        /// Draws a customizable separator line.
+        /// </summary>
+        protected void Separator(float height = 1f, float? width = null, Color? color = null)
         {
-            var rect = EditorGUILayout.GetControlRect(false, 1);
-            EditorGUI.DrawRect(rect, new Color(0.3f, 0.3f, 0.3f));
+            var rect = EditorGUILayout.GetControlRect(false, height);
+            if (width.HasValue)
+            {
+                rect.width = width.Value;
+                rect.x += (EditorGUILayout.GetControlRect(false, height).width - width.Value) * 0.5f;
+            }
+            EditorGUI.DrawRect(rect, color ?? CurrentTheme.SeparatorColor);
         }
 
         // =============== Helpful IMGUI helpers ===============
@@ -209,6 +282,9 @@ namespace CustomAssets.EditorTools
             if (Event.current.type == EventType.Repaint)
             {
                 EditorStyles.helpBox.Draw(r, GUIContent.none, false, false, false, false);
+                // top border accent
+                var border = new Rect(r.x, r.y, r.width, 1f);
+                EditorGUI.DrawRect(border, CurrentTheme.FooterBorderColor);
             }
             r.x += 6; r.width -= 12;
             var leftRect = new Rect(r.x, r.y, r.width * 0.6f, r.height);
@@ -224,9 +300,9 @@ namespace CustomAssets.EditorTools
         /// <summary>
         /// Horizontal group helper.
         /// </summary>
-        protected void Horizontal(System.Action content, params GUILayoutOption[] options)
+        protected void Horizontal(System.Action content)
         {
-            EditorGUILayout.BeginHorizontal(options);
+            EditorGUILayout.BeginHorizontal();
             content?.Invoke();
             EditorGUILayout.EndHorizontal();
         }
@@ -234,9 +310,9 @@ namespace CustomAssets.EditorTools
         /// <summary>
         /// Vertical group helper.
         /// </summary>
-        protected void Vertical(System.Action content, params GUILayoutOption[] options)
+        protected void Vertical(System.Action content)
         {
-            EditorGUILayout.BeginVertical(options);
+            EditorGUILayout.BeginVertical();
             content?.Invoke();
             EditorGUILayout.EndVertical();
         }
@@ -312,9 +388,9 @@ namespace CustomAssets.EditorTools
 
             if (Event.current.type == EventType.Repaint)
             {
-                EditorGUI.DrawRect(rect, new Color(0.13f, 0.13f, 0.13f));
+                EditorGUI.DrawRect(rect, CurrentTheme.BackgroundColor);
                 Rect fillRect = new Rect(rect.x + 1, rect.y + 1, (rect.width - 2) * progress, rect.height - 2);
-                EditorGUI.DrawRect(fillRect, new Color(0.2f, 0.6f, 1f));
+                EditorGUI.DrawRect(fillRect, CurrentTheme.AccentColor);
             }
 
             string displayText = label ?? string.Empty;
@@ -478,16 +554,6 @@ namespace CustomAssets.EditorTools
         }
 
         /// <summary>
-        /// Creates a button with an icon and text.
-        /// </summary>
-        protected bool IconButton(string text, string iconName, params GUILayoutOption[] options)
-        {
-            Texture2D icon = EditorGUIUtility.IconContent(iconName).image as Texture2D;
-            GUIContent content = new GUIContent(text, icon);
-            return GUILayout.Button(content, options);
-        }
-
-        /// <summary>
         /// Creates a selection grid with automatic wrapping.
         /// </summary>
         protected int SelectionGrid(int selected, string[] options, int maxColumns = 3, params GUILayoutOption[] options_)
@@ -557,15 +623,15 @@ namespace CustomAssets.EditorTools
         /// <summary>
         /// Creates a toggle button that shows its state visually.
         /// </summary>
-        protected bool ToggleButton(string text, bool value, params GUILayoutOption[] options)
+        protected bool ToggleButton(string text, bool value)
         {
             Color originalColor = GUI.backgroundColor;
             if (value)
             {
-                GUI.backgroundColor = new Color(0.7f, 1f, 0.7f);
+                GUI.backgroundColor = CurrentTheme.ToggleActiveColor;
             }
 
-            bool clicked = GUILayout.Button(text, options);
+            bool clicked = GUILayout.Button(text);
             GUI.backgroundColor = originalColor;
 
             return clicked ? !value : value;
@@ -622,6 +688,77 @@ namespace CustomAssets.EditorTools
 
             Rect rect = GUILayoutUtility.GetRect(width, height, GUILayout.Width(width), GUILayout.Height(height));
             GUI.DrawTexture(rect, texture);
+        }
+
+        // =============== Customizable Button helpers ===============
+
+        /// <summary>
+        /// Creates a button with customizable colors and styling.
+        /// </summary>
+        protected bool Button(string text, Color? backgroundColor = null, Color? textColor = null)
+        {
+            Color originalBg = GUI.backgroundColor;
+            Color originalText = GUI.contentColor;
+            
+            if (backgroundColor.HasValue)
+                GUI.backgroundColor = backgroundColor.Value;
+            if (textColor.HasValue)
+                GUI.contentColor = textColor.Value;
+            
+            bool clicked = GUILayout.Button(text);
+            
+            GUI.backgroundColor = originalBg;
+            GUI.contentColor = originalText;
+            
+            return clicked;
+        }
+
+        /// <summary>
+        /// Creates a themed button using accent color as background.
+        /// </summary>
+        protected bool AccentButton(string text)
+        {
+            return Button(text, CurrentTheme.AccentColor, Color.white);
+        }
+
+        /// <summary>
+        /// Creates a button with custom background color and white text.
+        /// </summary>
+        protected bool ColoredButton(string text, Color backgroundColor)
+        {
+            return Button(text, backgroundColor, Color.white);
+        }
+
+        /// <summary>
+        /// Creates a button with icon and customizable colors.
+        /// </summary>
+        protected bool IconButton(string text, string iconName, Color? backgroundColor = null, Color? textColor = null)
+        {
+            Texture2D icon = EditorGUIUtility.IconContent(iconName).image as Texture2D;
+            GUIContent content = new GUIContent(text, icon);
+            
+            Color originalBg = GUI.backgroundColor;
+            Color originalText = GUI.contentColor;
+            
+            if (backgroundColor.HasValue)
+                GUI.backgroundColor = backgroundColor.Value;
+            if (textColor.HasValue)
+                GUI.contentColor = textColor.Value;
+            
+            bool clicked = GUILayout.Button(content);
+            
+            GUI.backgroundColor = originalBg;
+            GUI.contentColor = originalText;
+            
+            return clicked;
+        }
+
+        /// <summary>
+        /// Creates a themed icon button using accent color.
+        /// </summary>
+        protected bool AccentIconButton(string text, string iconName)
+        {
+            return IconButton(text, iconName, CurrentTheme.AccentColor, Color.white);
         }
         
         // =============== Hooks management ===============

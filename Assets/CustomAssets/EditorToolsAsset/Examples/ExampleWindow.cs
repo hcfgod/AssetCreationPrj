@@ -46,11 +46,12 @@ public class ExampleWindow : KEditorWindow<ExampleWindow>
         );
 
         // Main content using tabs
-        TabGroup("main", new[] { "Controls", "Layout", "Visuals", "About" }, new System.Action<int>[]
+        TabGroup("main", new[] { "Controls", "Layout", "Visuals", "Theme", "About" }, new System.Action<int>[]
         {
             DrawControlsTab,
             DrawLayoutTab,
             DrawVisualsTab,
+            DrawThemeTab,
             DrawAboutTab
         });
 
@@ -82,6 +83,41 @@ public class ExampleWindow : KEditorWindow<ExampleWindow>
                 demoToggle = ToggleButton("Toggle", demoToggle);
                 
                 ConditionalButton("Conditional", demoToggle, "Enable toggle above first");
+            });
+            
+            EditorGUILayout.Space();
+            
+            Horizontal(() =>
+            {
+                if (AccentButton("Accent Button"))
+                {
+                    Debug.Log("Accent button clicked!");
+                }
+                
+                if (ColoredButton("Red Button", Color.red))
+                {
+                    Debug.Log("Red button clicked!");
+                }
+                
+                if (ColoredButton("Green Button", Color.green))
+                {
+                    Debug.Log("Green button clicked!");
+                }
+            });
+            
+            EditorGUILayout.Space();
+            
+            Horizontal(() =>
+            {
+                if (AccentIconButton("Refresh", "Refresh"))
+                {
+                    Debug.Log("Refresh icon button clicked!");
+                }
+                
+                if (IconButton("Help", "Help", Color.blue, Color.white))
+                {
+                    Debug.Log("Help icon button clicked!");
+                }
             });
         });
 
@@ -128,10 +164,29 @@ public class ExampleWindow : KEditorWindow<ExampleWindow>
             Horizontal(() =>
             {
                 EditorGUILayout.LabelField("Horizontal group:");
+
                 GUILayout.FlexibleSpace();
                 GUILayout.Button("Button 1");
                 GUILayout.Button("Button 2");
             });
+        });
+        
+        Foldout("separators", "Separator Examples", () =>
+        {
+            EditorGUILayout.LabelField("Default separator:");
+            Separator();
+            
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Thick separator:");
+            Separator(3f);
+            
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Short separator (50% width):");
+            Separator(2f, 100f);
+            
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Custom colored separator:");
+            Separator(2f, null, Color.red);
         });
     }
 
@@ -220,6 +275,65 @@ public class ExampleWindow : KEditorWindow<ExampleWindow>
         {
             EditorApplication.ExecuteMenuItem("Window/General/Project");
         }
+    }
+
+    private void DrawThemeTab(int tabIndex)
+    {
+        Header("Theme Settings");
+        Box(() =>
+        {
+            EditorGUILayout.LabelField("Adjust colors used by KEditorWindow helpers.");
+        });
+
+        Foldout("theme_colors", "Colors", () =>
+        {
+            var theme = (typeof(KEditorWindow<ExampleWindow>)
+                .GetField("_theme", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
+                ?.GetValue(this));
+
+            // Access via protected CurrentTheme property through reflection as well
+            var themeProp = typeof(KEditorWindow<ExampleWindow>)
+                .GetProperty("CurrentTheme", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+            var currentTheme = themeProp?.GetValue(this);
+            if (currentTheme == null) return;
+
+            // Helper to get/set fields via reflection
+            System.Func<string, Color> get = (name) =>
+            {
+                var fi = currentTheme.GetType().GetField(name);
+                return (Color)fi.GetValue(currentTheme);
+            };
+            System.Action<string, Color> set = (name, val) =>
+            {
+                var fi = currentTheme.GetType().GetField(name);
+                fi.SetValue(currentTheme, val);
+            };
+
+            Color bg = get("BackgroundColor");
+            Color ac = get("AccentColor");
+            Color sep = get("SeparatorColor");
+            Color foot = get("FooterBorderColor");
+            Color tog = get("ToggleActiveColor");
+
+            bg = ColorPicker("Background", bg);
+            ac = ColorPicker("Accent", ac);
+            sep = ColorPicker("Separator", sep);
+            foot = ColorPicker("Footer Border", foot);
+            tog = ColorPicker("Toggle Active", tog);
+
+            set("BackgroundColor", bg);
+            set("AccentColor", ac);
+            set("SeparatorColor", sep);
+            set("FooterBorderColor", foot);
+            set("ToggleActiveColor", tog);
+
+            // Call SaveTheme via reflection (protected method)
+            var saveThemeMi = typeof(KEditorWindow<ExampleWindow>).GetMethod("SaveTheme", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            saveThemeMi?.Invoke(this, null);
+        });
+
+        EditorGUILayout.Space();
+        Footer("Theme changes are saved per-window type.");
     }
 }
 #endif

@@ -234,8 +234,23 @@ public class ExampleWindow : KEditorWindow<ExampleWindow>
             Horizontal(() =>
             {
                 if (Button("Toolbar", null, null, EditorStyle.ToolbarButton, LayoutOption.Width80)) { }
-                if (Button("Popup", null, null, EditorStyle.Popup, LayoutOption.Width80)) { }
-                if (Button("Dropdown", null, null, EditorStyle.Popup, LayoutOption.Width80)) { }
+
+                DropdownButton("Popup", menu =>
+                {
+                    menu.AddItem(new GUIContent("Action/Do Thing"), false, () => Debug.Log("Do Thing"));
+                    menu.AddItem(new GUIContent("Action/Do Other"), false, () => Debug.Log("Do Other"));
+                    menu.AddSeparator("");
+                    menu.AddItem(new GUIContent("Settings"), false, () => Debug.Log("Settings"));
+                }, EditorStyle.Popup, LayoutOption.Width80);
+
+                DropdownButton("Dropdown", menu =>
+                {
+                    for (int i = 1; i <= 5; i++)
+                    {
+                        int captured = i;
+                        menu.AddItem(new GUIContent($"Item {captured}"), false, () => Debug.Log($"Item {captured}"));
+                    }
+                }, EditorStyle.Popup, LayoutOption.Width80);
             });
             
             EditorGUILayout.Space();

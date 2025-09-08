@@ -1018,6 +1018,27 @@ namespace CustomAssets.EditorTools
             return IconButton(text, iconName, CurrentTheme.AccentColor, Color.white, style, options);
         }
         
+        /// <summary>
+        /// Shows a dropdown menu when clicking a popup-styled button.
+        /// </summary>
+        protected void DropdownButton(string text, System.Action<GenericMenu> buildMenu, EditorStyle style = EditorStyle.Popup, params LayoutOption[] options)
+        {
+            if (Button(text, null, null, style, options))
+            {
+                var menu = new GenericMenu();
+                buildMenu?.Invoke(menu);
+                menu.ShowAsContext();
+            }
+        }
+
+        /// <summary>
+        /// Popup selection field that returns the selected index.
+        /// </summary>
+        protected int PopupField(string label, int selectedIndex, string[] displayedOptions, params LayoutOption[] options)
+        {
+            return EditorGUILayout.Popup(label, selectedIndex, displayedOptions, LayoutOptionConverter.ToGUILayoutOptions(options));
+        }
+
         // =============== Hooks management ===============
 
         /// <summary>

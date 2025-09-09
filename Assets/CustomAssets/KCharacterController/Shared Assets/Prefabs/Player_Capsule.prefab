@@ -176,7 +176,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4344043405975633358}
   m_Layer: 0
-  m_Name: ECM2_Capsule
+  m_Name: Player_Capsule
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

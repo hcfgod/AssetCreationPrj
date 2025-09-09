@@ -37,35 +37,50 @@ namespace CustomAssets.InteractionSystem
     /// <summary>
     /// Base class for interactable objects in the interaction system.
     /// </summary>
-    [RequireComponent(typeof(Collider))]
     public abstract class InteractableBase : MonoBehaviour, IInteractable
     {
         [Title("Interaction Settings")]
         [Tooltip("How this interactable behaves when used.")]
+        [TabGroup("Interaction", "Interaction Enums")]
         [SerializeField] private InteractionType _interactionType = InteractionType.Instant;
+
         [Tooltip("What happens to this interactable after a completed interaction.")]
+        [TabGroup("Interaction", "Interaction Enums")]
         [SerializeField] private PostInteractionAction _postAction = PostInteractionAction.None;
+
         [Tooltip("Duration (seconds) the input must be held when InteractionType is Hold.")]
+        [TabGroup("Interaction", "Interaction Settings")]
         [SerializeField] private float _holdDuration = 0.5f;
 
         [Title("Trigger Settings")]
         [Tooltip("Cooldown before this Trigger interactable can be triggered again. Only used when Interaction Mode is Trigger.")]
+        [TabGroup("Trigger", "Trigger Settings")]
         [SerializeField] private float _retriggerDelay = 0f;
 
         [Title("Trigger Filters")]
         [Tooltip("Only objects on these layers can trigger the interaction.")]
+        [TabGroup("Trigger", "Trigger Filters")]
         [SerializeField] private LayerMask _allowedLayers = ~0;
+
         [Tooltip("If enabled, only objects with this tag can trigger the interaction.")]
+        [TabGroup("Trigger", "Trigger Filters")]
         [SerializeField] private bool _useTagFilter = false;
+
+        [Tooltip("Required tag for objects to trigger the interaction.")]
+        [TabGroup("Trigger", "Trigger Filters")]
         [SerializeField] private string _requiredTag = "Player";
+
         [Tooltip("Require the entering object (or its parent) to have an InteractionHandler component.")]
+        [TabGroup("Trigger", "Trigger Filters")]
         [SerializeField] private bool _requireInteractionHandler = true;
 
         [Title("Stay Triggering (optional)")]
         [Tooltip("If enabled, will attempt to re-trigger while the object stays inside the trigger.")]
+        [TabGroup("Trigger", "Stay Triggering")]
         [SerializeField] private bool _retriggerOnStay = false;
         [Tooltip("Minimum interval between stay re-trigger attempts per object (seconds). 0 uses only the interactable's RetriggerDelay.")]
         [Min(0f)]
+        [TabGroup("Trigger", "Stay Triggering")]
         [SerializeField] private float _stayRepeatInterval = 0f;
 
         [Title("State (runtime)")]

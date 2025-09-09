@@ -4,8 +4,8 @@ namespace CustomAssets.InteractionSystem
 {
     /// <summary>
     /// Place this on a GameObject with a trigger Collider or Collider2D to define a custom trigger area
-    /// for an InteractableBase set to InteractionType.Trigger. When the player (with InteractionHandler)
-    /// enters this trigger, the interaction auto-fires.
+    /// for an InteractableBase set to InteractionType.Trigger. The trigger area will use the
+    /// filtering and timing options configured on the InteractableBase itself.
     /// </summary>
     [AddComponentMenu("CustomAssets/InteractionSystem/Interaction Trigger Area")]
     public class InteractionTriggerArea : MonoBehaviour
@@ -29,30 +29,72 @@ namespace CustomAssets.InteractionSystem
 
         private void OnTriggerEnter(Collider other)
         {
-            TryTrigger(other.gameObject);
+            if (_interactable != null) _interactable.TryAutoTrigger(other.gameObject);
         }
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            TryTrigger(other.gameObject);
+            if (_interactable != null) _interactable.TryAutoTrigger(other.gameObject);
         }
 
-        private void TryTrigger(GameObject otherGO)
+        private void OnTriggerStay(Collider other)
         {
-            if (_interactable == null) return;
-            if (_interactable.InteractionMode != InteractionType.Trigger) return;
-
-            var handler = otherGO.GetComponentInParent<InteractionHandler>();
-            if (handler == null) return;
-
-            var data = new InteractionData
-            {
-                Interactor = handler.gameObject,
-                InteractionTarget = _interactable.gameObject
-            };
-
-            _interactable.BeginInteraction(data);
-            _interactable.CompleteInteraction(data);
+            if (_interactable != null) _interactable.TryStayTrigger(other.gameObject);
         }
+
+        private void OnTriggerStay2D(Collider2D other)
+        {
+            if (_interactable != null) _interactable.TryStayTrigger(other.gameObject);
+        }
+
+        private void OnTriggerExit(Collider other)
+        {
+            if (_interactable != null) _interactable.CleanupStay(other.gameObject);
+        }
+
+        private void OnTriggerExit2D(Collider2D other)
+        {
+            if (_interactable != null) _interactable.CleanupStay(other.gameObject);
+        }
+
+#if UNITY_EDITOR
+        private void OnDrawGizmosSelected()
+        {
+            // Draw trigger bounds
+            Gizmos.color = Color.magenta;
+            var c3d = GetComponent<Collider>();
+            if (c3d != null)
+            {
+                var b = c3d.bounds;
+                Gizmos.DrawWireCube(b.center, b.size);
+            }
+            var c2d = GetComponent<Collider2D>();
+            if (c2d != null)
+            {
+                var b2 = c2d.bounds;
+                Gizmos.DrawWireCube(b2.center, b2.size);
+            }
+
+            // Label - now shows InteractableBase settings
+            if (_interactable != null)
+            {
+                string tagInfo = _interactable.UseTagFilter ? ($"Tag='{_interactable.RequiredTag}'") : "Tag=Any";
+                string handlerInfo = _interactable.RequireInteractionHandler ? "Handler=Req" : "Handler=Opt";
+                string stayInfo = _interactable.RetriggerOnStay ? ($"StayInt={_interactable.StayRepeatInterval:0.00}s") : "Stay=Off";
+                string retrigInfo = $"ReCD={_interactable.RetriggerDelay:0.00}s";
+                string label = $"TriggerArea [{tagInfo} | {handlerInfo} | {stayInfo} | {retrigInfo}]";
+
+                var pos = transform.position;
+                UnityEditor.Handles.color = Color.magenta;
+                UnityEditor.Handles.Label(pos + Vector3.up * 0.25f, label);
+            }
+            else
+            {
+                var pos = transform.position;
+                UnityEditor.Handles.color = Color.red;
+                UnityEditor.Handles.Label(pos + Vector3.up * 0.25f, "TriggerArea [No InteractableBase]");
+            }
+        }
+#endif
     }
 }

@@ -48,10 +48,32 @@ namespace CustomAssets.InteractionSystem
         [Tooltip("Duration (seconds) the input must be held when InteractionType is Hold.")]
         [SerializeField] private float _holdDuration = 0.5f;
 
+        [Title("Trigger Settings")]
+        [Tooltip("Cooldown before this Trigger interactable can be triggered again. Only used when Interaction Mode is Trigger.")]
+        [SerializeField] private float _retriggerDelay = 0f;
+
+        [Title("Trigger Filters")]
+        [Tooltip("Only objects on these layers can trigger the interaction.")]
+        [SerializeField] private LayerMask _allowedLayers = ~0;
+        [Tooltip("If enabled, only objects with this tag can trigger the interaction.")]
+        [SerializeField] private bool _useTagFilter = false;
+        [SerializeField] private string _requiredTag = "Player";
+        [Tooltip("Require the entering object (or its parent) to have an InteractionHandler component.")]
+        [SerializeField] private bool _requireInteractionHandler = true;
+
+        [Title("Stay Triggering (optional)")]
+        [Tooltip("If enabled, will attempt to re-trigger while the object stays inside the trigger.")]
+        [SerializeField] private bool _retriggerOnStay = false;
+        [Tooltip("Minimum interval between stay re-trigger attempts per object (seconds). 0 uses only the interactable's RetriggerDelay.")]
+        [Min(0f)]
+        [SerializeField] private float _stayRepeatInterval = 0f;
+
         [Title("State (runtime)")]
         [ReadOnly("This is just to see the state in the inspector.")]
         [SerializeField, Tooltip("Current interaction state. Managed at runtime.")]
         private InteractionState _state = InteractionState.Idle;
+        private float _lastTriggerTime = float.NegativeInfinity;
+        private readonly System.Collections.Generic.Dictionary<int, float> _lastStayAttemptTimes = new System.Collections.Generic.Dictionary<int, float>();
 
         /// <summary>
         /// Interaction behavior for this interactable.
@@ -65,6 +87,34 @@ namespace CustomAssets.InteractionSystem
         /// For Hold interaction type, how long the hold must last (seconds).
         /// </summary>
         public virtual float HoldDuration => _holdDuration;
+        /// <summary>
+        /// Cooldown before this Trigger interactable can be triggered again.
+        /// </summary>
+        public virtual float RetriggerDelay => _retriggerDelay;
+        /// <summary>
+        /// Only objects on these layers can trigger the interaction.
+        /// </summary>
+        public virtual LayerMask AllowedLayers => _allowedLayers;
+        /// <summary>
+        /// If enabled, only objects with the required tag can trigger the interaction.
+        /// </summary>
+        public virtual bool UseTagFilter => _useTagFilter;
+        /// <summary>
+        /// Required tag for objects to trigger the interaction.
+        /// </summary>
+        public virtual string RequiredTag => _requiredTag;
+        /// <summary>
+        /// Require the entering object to have an InteractionHandler component.
+        /// </summary>
+        public virtual bool RequireInteractionHandler => _requireInteractionHandler;
+        /// <summary>
+        /// If enabled, will attempt to re-trigger while the object stays inside the trigger.
+        /// </summary>
+        public virtual bool RetriggerOnStay => _retriggerOnStay;
+        /// <summary>
+        /// Minimum interval between stay re-trigger attempts per object (seconds).
+        /// </summary>
+        public virtual float StayRepeatInterval => _stayRepeatInterval;
         /// <summary>
         /// Current state of this interactable.
         /// </summary>
@@ -91,28 +141,131 @@ namespace CustomAssets.InteractionSystem
         // If this object itself has a trigger collider, auto-fire Trigger interactions on enter
         private void OnTriggerEnter(Collider other)
         {
-            if (InteractionMode != InteractionType.Trigger) return;
-
-            var handler = other.GetComponentInParent<InteractionHandler>();
-            if (handler == null) return;
-
-            var data = new InteractionData { Interactor = handler.gameObject, InteractionTarget = gameObject };
-
-            BeginInteraction(data);
-            CompleteInteraction(data);
+            TryAutoTrigger(other.gameObject);
         }
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (InteractionMode != InteractionType.Trigger) return;
+            TryAutoTrigger(other.gameObject);
+        }
 
-            var handler = other.GetComponentInParent<InteractionHandler>();
-            if (handler == null) return;
+        private void OnTriggerStay(Collider other)
+        {
+            TryStayTrigger(other.gameObject);
+        }
+
+        private void OnTriggerStay2D(Collider2D other)
+        {
+            TryStayTrigger(other.gameObject);
+        }
+
+        private void OnTriggerExit(Collider other)
+        {
+            CleanupStay(other.gameObject);
+        }
+
+        private void OnTriggerExit2D(Collider2D other)
+        {
+            CleanupStay(other.gameObject);
+        }
+
+        /// <summary>
+        /// Attempts to auto-trigger this interactable when in Trigger mode.
+        /// Respects RetriggerDelay and applies all configured filters.
+        /// </summary>
+        public virtual bool TryAutoTrigger(GameObject interactorGO)
+        {
+            if (InteractionMode != InteractionType.Trigger) return false;
+            if (interactorGO == null) return false;
+            if (!PassesFilters(interactorGO)) return false;
+
+            // Use <= to avoid same-frame double trigger when delay is 0
+            if (Time.time <= _lastTriggerTime + RetriggerDelay) return false;
+
+            var handler = interactorGO.GetComponentInParent<InteractionHandler>();
+            if (handler == null) return false;
 
             var data = new InteractionData { Interactor = handler.gameObject, InteractionTarget = gameObject };
 
             BeginInteraction(data);
             CompleteInteraction(data);
+
+            _lastTriggerTime = Time.time;
+            return true;
+        }
+
+        /// <summary>
+        /// Attempts to re-trigger this interactable while an object stays in the trigger.
+        /// Respects StayRepeatInterval and applies all configured filters.
+        /// </summary>
+        public virtual bool TryStayTrigger(GameObject interactorGO)
+        {
+            if (InteractionMode != InteractionType.Trigger) return false;
+            if (interactorGO == null) return false;
+            if (!PassesFilters(interactorGO)) return false;
+            if (!RetriggerOnStay) return false;
+
+            // Always respect the global retrigger delay to prevent double-triggering
+            // Use <= to avoid same-frame double trigger when delay is 0
+            if (Time.time <= _lastTriggerTime + RetriggerDelay) return false;
+
+            int instanceId = interactorGO.GetInstanceID();
+            bool hasLastAttempt = _lastStayAttemptTimes.TryGetValue(instanceId, out float lastAttempt);
+            float interval = StayRepeatInterval > 0f ? StayRepeatInterval : RetriggerDelay;
+
+            // First Stay after entering should not trigger; initialize tracking and return
+            if (!hasLastAttempt)
+            {
+                _lastStayAttemptTimes[instanceId] = Time.time;
+                return false;
+            }
+
+            // Use <= to avoid same-frame double trigger when interval is 0
+            if (Time.time <= lastAttempt + interval) return false;
+
+            var handler = interactorGO.GetComponentInParent<InteractionHandler>();
+            if (handler == null) return false;
+
+            var data = new InteractionData { Interactor = handler.gameObject, InteractionTarget = gameObject };
+
+            BeginInteraction(data);
+            CompleteInteraction(data);
+
+            // Update both the global trigger time and the per-object stay time
+            _lastTriggerTime = Time.time;
+            _lastStayAttemptTimes[instanceId] = Time.time;
+            return true;
+        }
+
+        /// <summary>
+        /// Checks if the given GameObject passes all configured trigger filters.
+        /// </summary>
+        protected virtual bool PassesFilters(GameObject otherGO)
+        {
+            if (otherGO == null) return false;
+
+            // Layer filter
+            if ((AllowedLayers.value & (1 << otherGO.layer)) == 0) return false;
+
+            // Tag filter
+            if (UseTagFilter)
+            {
+                if (string.IsNullOrEmpty(RequiredTag) || !otherGO.CompareTag(RequiredTag)) return false;
+            }
+
+            // Require InteractionHandler if requested
+            if (RequireInteractionHandler && otherGO.GetComponentInParent<InteractionHandler>() == null) return false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Cleans up stay trigger tracking for the given GameObject.
+        /// </summary>
+        public virtual void CleanupStay(GameObject otherGO)
+        {
+            if (otherGO == null) return;
+            _lastStayAttemptTimes.Remove(otherGO.GetInstanceID());
         }
 
         /// <summary>

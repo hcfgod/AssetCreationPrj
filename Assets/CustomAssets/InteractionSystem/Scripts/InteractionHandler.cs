@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using CustomAssets.EditorTools;
 
 namespace CustomAssets.InteractionSystem
 {
@@ -10,29 +11,43 @@ namespace CustomAssets.InteractionSystem
     /// </summary>
     public class InteractionHandler : MonoBehaviour
     {
-        [Header("Input System")]
+        [Title("Input System")]
         [Tooltip("Input Action used to trigger interactions (e.g. " + "'Player/Interact'" + ").")]
         [SerializeField] private InputActionReference _interactAction;
 
-        [Header("Targeting & Detection")]
+        [Title("Targeting & Detection")]
+        [TabGroup("Targeting & Detection", "Camera & Range")]
         [SerializeField] private Camera _camera;
+
+        [TabGroup("Targeting & Detection", "Camera & Range")]
         [Tooltip("Layer mask to limit interactable detection.")]
         [SerializeField] private LayerMask _layerMask = ~0;
+
+        [TabGroup("Targeting & Detection", "Camera & Range")]
         [Tooltip("Maximum detection range in world units.")]
         [SerializeField] private float _range = 3f;
+
+        [TabGroup("Targeting & Detection", "Physics Options")]
         [Tooltip("Enable 3D Physics detection via ray/sphere cast.")]
         [SerializeField] private bool _use3D = true;
+
+        [TabGroup("Targeting & Detection", "Physics Options")]
         [Tooltip("Enable 2D Physics detection via overlap circle.")]
         [SerializeField] private bool _use2D = true;
+
+        [TabGroup("Targeting & Detection", "Physics Options")]
         [Tooltip("If true, uses a sphere cast in 3D (better for small targets). If false, uses a raycast.")]
         [SerializeField] private bool _useSphereCast3D = true;
+
+        [TabGroup("Targeting & Detection", "Physics Options")]
         [SerializeField] private float _sphereCastRadius = 0.2f;
-        [Header("View Gate")]
+
+        [Title("View Gate")]
         [Tooltip("Require the target to be near the screen center (normalized viewport radius, 0..0.5). Set 0 to disable.")]
         [Range(0f, 0.5f)]
         [SerializeField] private float _viewportCenterRadius = 0.08f;
 
-        [Header("Debug")]
+        [Title("Debug")]
         [SerializeField] private bool _drawGizmos = true;
 
         private IInteractable _currentTarget;

@@ -305,7 +305,6 @@ namespace CustomAssets.InteractionSystem
             }
         }
 
-
         private IInteractable AcquireTarget()
         {
             IInteractable found = null;

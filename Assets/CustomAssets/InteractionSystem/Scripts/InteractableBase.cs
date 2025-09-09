@@ -92,9 +92,12 @@ namespace CustomAssets.InteractionSystem
         private void OnTriggerEnter(Collider other)
         {
             if (InteractionMode != InteractionType.Trigger) return;
+
             var handler = other.GetComponentInParent<InteractionHandler>();
             if (handler == null) return;
+
             var data = new InteractionData { Interactor = handler.gameObject, InteractionTarget = gameObject };
+
             BeginInteraction(data);
             CompleteInteraction(data);
         }
@@ -102,9 +105,12 @@ namespace CustomAssets.InteractionSystem
         private void OnTriggerEnter2D(Collider2D other)
         {
             if (InteractionMode != InteractionType.Trigger) return;
+
             var handler = other.GetComponentInParent<InteractionHandler>();
             if (handler == null) return;
+
             var data = new InteractionData { Interactor = handler.gameObject, InteractionTarget = gameObject };
+
             BeginInteraction(data);
             CompleteInteraction(data);
         }

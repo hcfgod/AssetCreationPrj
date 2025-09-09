@@ -140,13 +140,16 @@ namespace CustomAssets.InteractionSystem
             if (_currentTarget == null)
                 return;
 
+            // Read per-target config from the candidate first
+            GetInteractionConfig(_currentTarget, out var type, out var holdDuration, out _);
+
+            // Do not allow pressing the interact input to trigger Trigger-type interactions
+            if (type == InteractionType.Trigger)
+                return;
+
             _activeInteractionTarget = _currentTarget;
             var data = BuildInteractionData(_activeInteractionTarget);
-
-            // Read per-target config
-            GetInteractionConfig(_activeInteractionTarget, out var type, out var holdDuration, out _);
             var baseTarget = _activeInteractionTarget as InteractableBase;
-
 
             switch (type)
             {
@@ -162,23 +165,6 @@ namespace CustomAssets.InteractionSystem
                     {
                         _activeInteractionTarget.OnInteractStart(data);
                         _activeInteractionTarget.OnInteractProgress(data, 1f);
-                        _activeInteractionTarget.OnInteractEnd(data);
-                    }
-                    _activeInteractionTarget = null;
-                    _isInteracting = false;
-                    break;
-                }
-                case InteractionType.Trigger:
-                {
-                    // Fire and forget like Instant, but without progress (or with 1 if desired)
-                    if (baseTarget != null)
-                    {
-                        baseTarget.BeginInteraction(data);
-                        baseTarget.CompleteInteraction(data);
-                    }
-                    else
-                    {
-                        _activeInteractionTarget.OnInteractStart(data);
                         _activeInteractionTarget.OnInteractEnd(data);
                     }
                     _activeInteractionTarget = null;

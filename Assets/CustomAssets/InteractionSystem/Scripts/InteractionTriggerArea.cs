@@ -25,6 +25,8 @@ namespace CustomAssets.InteractionSystem
         private void Awake()
         {
             if (_interactable == null) _interactable = GetComponentInParent<InteractableBase>();
+            if(_interactable == null) _interactable = GetComponent<InteractableBase>();
+            if(_interactable == null) Debug.LogError("InteractionTriggerArea: No InteractableBase found on " + gameObject.name);
         }
 
         private void OnTriggerEnter(Collider other)

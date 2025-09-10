@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using CustomAssets.EditorTools;
+using System.Reflection;
 
 namespace CustomAssets.EditorTools.Editor
 {
@@ -12,11 +13,36 @@ namespace CustomAssets.EditorTools.Editor
     [CustomPropertyDrawer(typeof(TitleAttribute))]
     public class TitleDecoratorDrawer : DecoratorDrawer
     {
+        private static FieldInfo GetBackingFieldInfo(DecoratorDrawer drawer)
+        {
+            // Unity stores the decorated field info in a private member on the base type
+            var fi = typeof(DecoratorDrawer).GetField("m_FieldInfo", BindingFlags.Instance | BindingFlags.NonPublic);
+            return fi != null ? fi.GetValue(drawer) as FieldInfo : null;
+        }
+
+        private bool IsVisibleForActiveTab()
+        {
+            // Try to find a TabGroupAttribute on the same field; if found, only draw when that tab is active.
+            var field = GetBackingFieldInfo(this);
+            if (field == null)
+                return true; // Can't determine context; draw by default
+
+            var tabAttr = field.GetCustomAttribute<TabGroupAttribute>(true);
+            if (tabAttr == null)
+                return true; // Not part of a tab group
+
+            // Consult TabGroupPropertyDrawer's global state keyed by group name only.
+            return TabGroupPropertyDrawer.IsTabActiveForGroupName(tabAttr.GroupName, tabAttr.TabName);
+        }
+
         /// <summary>
         /// Gets the height of the title decorator.
         /// </summary>
         public override float GetHeight()
         {
+            if (!IsVisibleForActiveTab())
+                return 0f;
+
             TitleAttribute titleAttribute = (TitleAttribute)attribute;
             float height = EditorGUIUtility.singleLineHeight;
 
@@ -34,6 +60,9 @@ namespace CustomAssets.EditorTools.Editor
         /// <param name="position">The position and size of the decorator.</param>
         public override void OnGUI(Rect position)
         {
+            if (!IsVisibleForActiveTab())
+                return;
+
             TitleAttribute titleAttribute = (TitleAttribute)attribute;
 
             // Calculate title position

@@ -17,10 +17,22 @@ namespace CustomAssets.EditorTools.Editor
 
 		// Tracks active tab per object+group key
 		private static readonly Dictionary<string, string> activeTabByGroupKey = new Dictionary<string, string>();
+		// Tracks active tab by group name only (used by decorators that don't know the object context)
+		private static readonly Dictionary<string, string> activeTabByGroupName = new Dictionary<string, string>();
 		// Tracks discovered tabs per group to draw a unified toolbar
 		private static readonly Dictionary<string, SortedSet<string>> tabsByGroupKey = new Dictionary<string, SortedSet<string>>();
 		// Tracks which property path should draw the toolbar for a given group (first by order then propertyPath)
 		private static readonly Dictionary<string, string> toolbarOwnerByGroupKey = new Dictionary<string, string>();
+
+		/// <summary>
+		/// Returns true if the given tabName is the active tab for the provided group name.
+		/// If the group hasn't been initialized yet, defaults to true to avoid hiding content unexpectedly.
+		/// </summary>
+		public static bool IsTabActiveForGroupName(string groupName, string tabName)
+		{
+			if (string.IsNullOrEmpty(groupName) || string.IsNullOrEmpty(tabName)) return true;
+			return !activeTabByGroupName.TryGetValue(groupName, out string active) || string.Equals(active, tabName);
+		}
 
 		public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
 		{
@@ -50,7 +62,7 @@ namespace CustomAssets.EditorTools.Editor
 			// Register this tab name in the group
 			EnsureTabRegistered(groupKey, attr.TabName);
 			EnsureToolbarOwner(property, attr, groupKey);
-			EnsureActiveTabInitialized(groupKey);
+			EnsureActiveTabInitialized(groupKey, attr.GroupName);
 
 			float y = position.y;
 			bool ownsToolbar = IsToolbarOwner(property, attr, groupKey);
@@ -74,23 +86,38 @@ namespace CustomAssets.EditorTools.Editor
 			return objId + "::" + attr.GroupName;
 		}
 
+		private static string ExtractGroupNameFromKey(string groupKey)
+		{
+			int sep = groupKey.IndexOf("::");
+			return sep >= 0 && sep + 2 < groupKey.Length ? groupKey.Substring(sep + 2) : groupKey;
+		}
+
 		private static bool IsVisibleForActiveTab(SerializedProperty property, TabGroupAttribute attr, string groupKey)
 		{
 			return !activeTabByGroupKey.TryGetValue(groupKey, out string active) || string.Equals(active, attr.TabName);
 		}
 
-		private static void EnsureActiveTabInitialized(string groupKey)
+		private static void EnsureActiveTabInitialized(string groupKey, string groupName)
 		{
 			if (!activeTabByGroupKey.ContainsKey(groupKey))
 			{
 				if (tabsByGroupKey.TryGetValue(groupKey, out SortedSet<string> set) && set.Count > 0)
 				{
 					// pick first tab alphabetically as default
-					foreach (var t in set) { activeTabByGroupKey[groupKey] = t; break; }
+					foreach (var t in set) { activeTabByGroupKey[groupKey] = t; activeTabByGroupName[groupName] = t; break; }
 				}
 				else
 				{
 					activeTabByGroupKey[groupKey] = "Default";
+					activeTabByGroupName[groupName] = "Default";
+				}
+			}
+			else
+			{
+				// keep group-name mapping in sync
+				if (activeTabByGroupKey.TryGetValue(groupKey, out string active))
+				{
+					activeTabByGroupName[groupName] = active;
 				}
 			}
 		}
@@ -168,7 +195,11 @@ namespace CustomAssets.EditorTools.Editor
 			int newIndex = GUI.Toolbar(rect, currentIndex, tabs, EditorStyles.toolbarButton);
 			if (newIndex != currentIndex)
 			{
-				activeTabByGroupKey[groupKey] = tabs[newIndex];
+				string selected = tabs[newIndex];
+				activeTabByGroupKey[groupKey] = selected;
+				// keep group-name mapping in sync
+				string groupName = ExtractGroupNameFromKey(groupKey);
+				activeTabByGroupName[groupName] = selected;
 			}
 		}
 	}

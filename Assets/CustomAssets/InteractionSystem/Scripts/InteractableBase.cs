@@ -1,5 +1,6 @@
-using CustomAssets.EditorTools;
+using System.Collections.Generic;
 using UnityEngine;
+using CustomAssets.EditorTools;
 
 /** Summary:
  * The InteractableBase class is an abstract base class for all interactable objects in the interaction system.
@@ -79,7 +80,7 @@ namespace CustomAssets.InteractionSystem
         [TabGroup("Trigger", "Stay Triggering")]
         [SerializeField] private bool _retriggerOnStay = false;
         [Tooltip("Minimum interval between stay re-trigger attempts per object (seconds). 0 uses only the interactable's RetriggerDelay.")]
-        [Min(0f)]
+        [MinValue(0.0f)]
         [TabGroup("Trigger", "Stay Triggering")]
         [SerializeField] private float _stayRepeatInterval = 0f;
 
@@ -87,8 +88,9 @@ namespace CustomAssets.InteractionSystem
         [ReadOnly("This is just to see the state in the inspector.")]
         [SerializeField, Tooltip("Current interaction state. Managed at runtime.")]
         private InteractionState _state = InteractionState.Idle;
+
         private float _lastTriggerTime = float.NegativeInfinity;
-        private readonly System.Collections.Generic.Dictionary<int, float> _lastStayAttemptTimes = new System.Collections.Generic.Dictionary<int, float>();
+        private readonly Dictionary<int, float> _lastStayAttemptTimes = new Dictionary<int, float>();
 
         /// <summary>
         /// Interaction behavior for this interactable.
